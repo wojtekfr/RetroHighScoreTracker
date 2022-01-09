@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">HighScoreTracker</string>
+    <string name="addButtonText">Add game</string>
+    <string name="saveGameButton"><![CDATA[Save Game & Score]]></string>
+</resources>
