@@ -19,7 +19,7 @@ import java.util.Objects;
 import wojtekfr.highscoretracker.adapter.RecyclerViewAdapter;
 import wojtekfr.highscoretracker.model.Game;
 import wojtekfr.highscoretracker.model.GameViewModel;
-
+// git test
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnGameClickListener {
 
     private static final int NEW_GAME_ACTIVITY_REQUEST_CODE = 1;
