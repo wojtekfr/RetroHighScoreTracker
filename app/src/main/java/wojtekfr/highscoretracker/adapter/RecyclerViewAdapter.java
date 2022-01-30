@@ -19,12 +19,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private List<Game> gameList;
     private Context context;
-    private OnGameClickListener gameClickListener;
+    private OnGameClickListener GameClickListener;
 
     public RecyclerViewAdapter(List<Game> gameList, Context context, OnGameClickListener onGameClickListener) {
         this.gameList = gameList;
         this.context = context;
-        this.gameClickListener = onGameClickListener;
+        this.GameClickListener = onGameClickListener;
     }
 
     @NonNull
@@ -32,7 +32,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.game_row, parent, false);
 
-        return new ViewHolder(view, gameClickListener);
+        return new ViewHolder(view);
     }
 
     @Override
@@ -55,12 +55,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         public TextView score;
         public TextView note;
 
-        public ViewHolder(@NonNull View itemView, OnGameClickListener onGameClickListener) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
             game = itemView.findViewById(R.id.textViewRowGame);
             score = itemView.findViewById(R.id.textViewRowScore);
             note = itemView.findViewById(R.id.textViewRowNote);
-            this.onGameClickListener = onGameClickListener;
+            this.onGameClickListener = GameClickListener;
             itemView.setOnClickListener(this);
         }
 

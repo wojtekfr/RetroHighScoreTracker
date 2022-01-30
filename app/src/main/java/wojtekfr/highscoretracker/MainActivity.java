@@ -2,6 +2,8 @@ package wojtekfr.highscoretracker;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -9,8 +11,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,11 +37,21 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private RecyclerView recyclerView;
     private RecyclerViewAdapter recyclerViewAdapter;
     MainActivity mainActivity;
+    BottomSheetFragment bottomSheetFragment;
+    Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        bottomSheetFragment = new BottomSheetFragment();
+        ConstraintLayout constraintLayout = findViewById(R.id.bottomSheet);
+
+//        BottomSheetBehavior<ConstraintLayout> bottomSheetBehavior = BottomSheetBehavior
+//                .from(constraintLayout);
+//        bottomSheetBehavior.setPeekHeight(BottomSheetBehavior.STATE_HIDDEN);
 
         recyclerView = findViewById(R.id.recyclerViewGamesList);
         recyclerView.setHasFixedSize(true);
@@ -46,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         searchButton = findViewById(R.id.buttonSearch);
         editTextSearchCondition = findViewById(R.id.editTextSearchCondition);
         resetSearchButton = findViewById(R.id.buttonSearchReset);
+        button = findViewById(R.id.button);
 
         gameArrayList = new ArrayList<>();
         gameViewModel = new ViewModelProvider.AndroidViewModelFactory(MainActivity.this.getApplication())
@@ -81,6 +97,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                     recyclerView.setAdapter(recyclerViewAdapter);
                     editTextSearchCondition.setText("");
                 }));
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
+            }
+        });
+
     }
 
     private void executeSearch() {
@@ -112,9 +136,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
     @Override
     public void onGameClick(int position) {
-        Game game = Objects.requireNonNull(gameViewModel.allGames.getValue().get(position));
-        Intent intent = new Intent(MainActivity.this, AddGame.class);
-        intent.putExtra("id", game.getId());
-        startActivity(intent);
+        //Game game = Objects.requireNonNull(gameViewModel.allGames.getValue().get(position));
+
+        bottomSheetFragment.setPosition(position);
+        Log.d("xxx", "a " + position);
+        bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
+
+        //        Intent intent = new Intent(MainActivity.this, AddGame.class);
+//        intent.putExtra("id", game.getId());
+//        startActivity(intent);
     }
 }

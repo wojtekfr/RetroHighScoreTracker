@@ -15,17 +15,22 @@ public class Game {
     @ColumnInfo(name = "game")
     private String gameName;
 
-    public Game(String gameName, int highScore, String note, Date lastUpdate) {
-        this.gameName = gameName;
-        this.highScore = highScore;
-        this.note = note;
-        this.lastUpdate = lastUpdate;
-    }
+
 
     @ColumnInfo(name ="high_score")
     private int highScore;
     @ColumnInfo(name = "note")
     private String note;
+
+    private Byte[] image;
+
+    public Game(String gameName, int highScore, String note, Date lastUpdate, Byte[] image) {
+        this.gameName = gameName;
+        this.highScore = highScore;
+        this.note = note;
+        this.lastUpdate = lastUpdate;
+        this.image = image;
+    }
 
     public Date getLastUpdate() {
         return lastUpdate;
