@@ -1,5 +1,7 @@
 package wojtekfr.highscoretracker.model;
 
+import android.graphics.Bitmap;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -14,23 +16,36 @@ public class Game {
 
     @ColumnInfo(name = "game")
     private String gameName;
-
-
-
     @ColumnInfo(name ="high_score")
     private int highScore;
     @ColumnInfo(name = "note")
     private String note;
+    @ColumnInfo(name = "last_update")
+    private Date lastUpdate;
+    @ColumnInfo(typeAffinity =  ColumnInfo.BLOB)
+    private Bitmap image;
 
-    private Byte[] image;
+    public Bitmap getImage() {
+        return image;
+    }
 
-    public Game(String gameName, int highScore, String note, Date lastUpdate, Byte[] image) {
+    public void setImage(Bitmap image) {
+        this.image = image;
+    }
+
+
+
+//    public Game(String gameName, int highScore, String note, Date lastUpdate) {
+    public Game(String gameName, int highScore, String note, Date lastUpdate,  Bitmap image) {
         this.gameName = gameName;
         this.highScore = highScore;
         this.note = note;
         this.lastUpdate = lastUpdate;
         this.image = image;
+
     }
+
+
 
     public Date getLastUpdate() {
         return lastUpdate;
@@ -40,8 +55,7 @@ public class Game {
         this.lastUpdate = lastUpdate;
     }
 
-    @ColumnInfo(name = "last_update")
-    private Date lastUpdate;
+
 
 
 

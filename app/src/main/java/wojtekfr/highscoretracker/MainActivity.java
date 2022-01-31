@@ -24,6 +24,8 @@ import java.util.Objects;
 import wojtekfr.highscoretracker.adapter.RecyclerViewAdapter;
 import wojtekfr.highscoretracker.model.Game;
 import wojtekfr.highscoretracker.model.GameViewModel;
+import wojtekfr.highscoretracker.util.Converters;
+
 // git test
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnGameClickListener {
 
@@ -127,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                 Game game = new Game(data.getStringExtra("gameName"),
                         data.getIntExtra("score", 0),
                         data.getStringExtra("note"),
-                        lastUpdate);
+                        lastUpdate, Converters.convertByteArray2Image(data.getByteArrayExtra("image")));
                 Log.d("xxx", "a " + game.getGameName());
                 GameViewModel.insert(game);
             }

@@ -1,14 +1,19 @@
 package wojtekfr.highscoretracker;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +23,7 @@ import java.util.Date;
 
 import wojtekfr.highscoretracker.model.Game;
 import wojtekfr.highscoretracker.model.GameViewModel;
+import wojtekfr.highscoretracker.util.Converters;
 
 public class AddGame extends AppCompatActivity {
 
@@ -29,12 +35,13 @@ public class AddGame extends AppCompatActivity {
     Button deleteButton;
     TextView lastUpdateTextView;
     boolean areDataCorrect;
-
-
     boolean isEditMode;
     int gameId;
-
     GameViewModel gameViewModel;
+    Button takePhotoButton;
+    ImageView imageView;
+    Bitmap bmpImage;
+    final int CAMERA_INTENT = 51;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +55,10 @@ public class AddGame extends AppCompatActivity {
         updateButton = findViewById(R.id.buttonUpdate);
         deleteButton = findViewById(R.id.buttonDelete);
         lastUpdateTextView = findViewById(R.id.textViewLastUpdate);
+        takePhotoButton = findViewById(R.id.buttonTakePhoto);
+        imageView = findViewById(R.id.imageViewPhoto);
+        bmpImage = null;
+
 
         gameViewModel = new ViewModelProvider.AndroidViewModelFactory(AddGame.this
                 .getApplication()).create(GameViewModel.class);
@@ -61,6 +72,8 @@ public class AddGame extends AppCompatActivity {
                     scoreEditText.setText(String.valueOf(game.getHighScore()));
                     noteEditText.setText(game.getNote());
                     lastUpdateTextView.setText("last update:" + game.getLastUpdate());
+                    imageView.setVisibility(View.VISIBLE);
+                    imageView.setImageBitmap(game.getImage());
                 }
             });
         }
@@ -71,6 +84,7 @@ public class AddGame extends AppCompatActivity {
             updateButton.setVisibility(View.GONE);
             deleteButton.setVisibility(View.GONE);
             lastUpdateTextView.setVisibility(View.GONE);
+            imageView.setVisibility(View.GONE);
         }
 
         saveGameButton.setOnClickListener(view -> {
@@ -87,6 +101,7 @@ public class AddGame extends AppCompatActivity {
                 replyIntent.putExtra("score", score);
                 replyIntent.putExtra("note", note);
                 replyIntent.putExtra("lastUpdate", new Date(System.currentTimeMillis()).toString());
+                replyIntent.putExtra("image", Converters.convertImage2ByteArray(bmpImage));
                 setResult(RESULT_OK, replyIntent);
                 finish();
             }
@@ -106,13 +121,21 @@ public class AddGame extends AppCompatActivity {
             GameViewModel.delete(game);
             finish();
         });
+        takePhotoButton.setOnClickListener(view -> {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(intent, CAMERA_INTENT);
+            }
+
+
+        });
     }
 
     private Game prepareGameObject() {
         Game game = new Game(gameEditText.getText().toString().trim(),
                 Integer.valueOf(scoreEditText.getText().toString().trim()),
                 noteEditText.getText().toString().trim(),
-                new Date(System.currentTimeMillis()));
+                new Date(System.currentTimeMillis()), bmpImage);
         game.setId(gameId = getIntent().getIntExtra("id", 1));
         return game;
     }
@@ -134,4 +157,25 @@ public class AddGame extends AppCompatActivity {
         }
         return true;
     }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CAMERA_INTENT){
+
+                if (resultCode == Activity.RESULT_OK) {
+                    bmpImage = (Bitmap) data.getExtras().get("data");
+                    Log.d("xxx", "h " + bmpImage.getHeight() + "w " + bmpImage.getWidth());
+                    if (bmpImage != null) {
+                        imageView.setImageBitmap(bmpImage);
+                        imageView.setVisibility(View.VISIBLE);
+                    }
+                }
+
+        }
+    }
+
+
 }

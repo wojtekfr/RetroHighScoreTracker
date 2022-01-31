@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 import wojtekfr.highscoretracker.data.GameDao;
 import wojtekfr.highscoretracker.model.Game;
 //aa
-@Database(entities = {Game.class}, version = 3, exportSchema = false)
+@Database(entities = {Game.class}, version = 5, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class GameRoomDatabase extends RoomDatabase {
 
