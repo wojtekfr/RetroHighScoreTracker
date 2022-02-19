@@ -65,6 +65,7 @@ public class AddGame extends AppCompatActivity {
 
         if (getIntent().hasExtra("id")) {
             isEditMode = true;
+
             gameId = getIntent().getIntExtra("id", 1);
             gameViewModel.get(gameId).observe(this, game -> {
                 if (game != null) {
@@ -72,8 +73,14 @@ public class AddGame extends AppCompatActivity {
                     scoreEditText.setText(String.valueOf(game.getHighScore()));
                     noteEditText.setText(game.getNote());
                     lastUpdateTextView.setText("last update:" + game.getLastUpdate());
-                    imageView.setVisibility(View.VISIBLE);
-                    imageView.setImageBitmap(game.getImage());
+
+                    if (game.getImage() != null) {
+                        imageView.setVisibility(View.VISIBLE);
+                        bmpImage = game.getImage();
+                        imageView.setImageBitmap(bmpImage);
+                    } else {
+                        imageView.setVisibility(View.GONE);
+                    }
                 }
             });
         }
@@ -90,19 +97,23 @@ public class AddGame extends AppCompatActivity {
         saveGameButton.setOnClickListener(view -> {
             areDataCorrect = checkIfDataCorrect();
 
-            Log.d("xxx", "a " + areDataCorrect);
+
             if (areDataCorrect) {
+
                 Intent replyIntent = new Intent();
                 String gameName = gameEditText.getText().toString().trim();
                 int score = Integer.valueOf(scoreEditText.getText().toString().trim());
                 String note = noteEditText.getText().toString().trim();
-                replyIntent.putExtra("gameName", gameName);
 
-                replyIntent.putExtra("score", score);
-                replyIntent.putExtra("note", note);
-                replyIntent.putExtra("lastUpdate", new Date(System.currentTimeMillis()).toString());
-                replyIntent.putExtra("image", Converters.convertImage2ByteArray(bmpImage));
-                setResult(RESULT_OK, replyIntent);
+
+                Date lastUpdate = new Date(System.currentTimeMillis());
+                Game game = new Game(gameName,
+                        score,
+                        note,
+                        lastUpdate);
+
+                GameViewModel.insert(game);
+
                 finish();
             }
 
@@ -110,7 +121,9 @@ public class AddGame extends AppCompatActivity {
 
         updateButton.setOnClickListener(view -> {
             if (checkIfDataCorrect()) {
+
                 Game game = prepareGameObject();
+                if (bmpImage == null) Log.d("xxx", "is null");
                 GameViewModel.update(game);
                 finish();
             }
@@ -163,16 +176,15 @@ public class AddGame extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == CAMERA_INTENT){
+        if (requestCode == CAMERA_INTENT) {
 
-                if (resultCode == Activity.RESULT_OK) {
-                    bmpImage = (Bitmap) data.getExtras().get("data");
-                    Log.d("xxx", "h " + bmpImage.getHeight() + "w " + bmpImage.getWidth());
-                    if (bmpImage != null) {
-                        imageView.setImageBitmap(bmpImage);
-                        imageView.setVisibility(View.VISIBLE);
-                    }
+            if (resultCode == Activity.RESULT_OK) {
+                bmpImage = (Bitmap) data.getExtras().get("data");
+                if (bmpImage != null) {
+                    imageView.setImageBitmap(bmpImage);
+                    imageView.setVisibility(View.VISIBLE);
                 }
+            }
 
         }
     }

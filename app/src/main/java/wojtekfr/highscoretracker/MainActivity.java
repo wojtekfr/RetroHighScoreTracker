@@ -120,28 +120,31 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (data != null) {
-            if (data.hasExtra("gameName")) {
-                Date lastUpdate = new Date(data.getStringExtra("lastUpdate"));
-                Game game = new Game(data.getStringExtra("gameName"),
-                        data.getIntExtra("score", 0),
-                        data.getStringExtra("note"),
-                        lastUpdate, Converters.convertByteArray2Image(data.getByteArrayExtra("image")));
-                Log.d("xxx", "a " + game.getGameName());
-                GameViewModel.insert(game);
-            }
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (data != null) {
+//            if (data.hasExtra("gameName")) {
+//                Date lastUpdate = new Date(data.getStringExtra("lastUpdate"));
+//                Game game = new Game(data.getStringExtra("gameName"),
+//                        data.getIntExtra("score", 0),
+//                        data.getStringExtra("note"),
+//                        lastUpdate, Converters.convertByteArray2Image(data.getByteArrayExtra("image")));
+//                Log.d("xxx", "a " + game.getGameName());
+//                GameViewModel.insert(game);
+//            }
+//        }
+//    }
 
     @Override
     public void onGameClick(int position) {
         //Game game = Objects.requireNonNull(gameViewModel.allGames.getValue().get(position));
+        Game currentGame = gameViewModel.getAllGames().getValue().get(position);
 
-        bottomSheetFragment.setPosition(position);
-        Log.d("xxx", "a " + position);
+        Log.d("xxxcurrent game", "a " + currentGame.getGameName());
+        bottomSheetFragment.setPosition(currentGame.getId());
+        Log.d("xxxposition", "a " + position);
+        Log.d("xxxcurrent game pos ", "a " + currentGame.getId());
         bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
 
         //        Intent intent = new Intent(MainActivity.this, AddGame.class);

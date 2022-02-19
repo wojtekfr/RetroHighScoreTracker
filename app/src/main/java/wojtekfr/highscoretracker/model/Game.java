@@ -45,6 +45,15 @@ public class Game {
 
     }
 
+    public Game(String gameName, int highScore, String note, Date lastUpdate) {
+        this.gameName = gameName;
+        this.highScore = highScore;
+        this.note = note;
+        this.lastUpdate = lastUpdate;
+        this.image = image;
+
+    }
+
 
 
     public Date getLastUpdate() {

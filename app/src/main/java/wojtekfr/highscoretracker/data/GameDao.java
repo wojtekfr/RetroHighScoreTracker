@@ -23,8 +23,17 @@ public interface GameDao {
     @Query("SELECT * FROM game_table")
     LiveData<List<Game>> getAllGames();
 
+    @Query("SELECT * FROM game_table ORDER BY game ASC")
+    LiveData<List<Game>> getAllGamesSortedByAlphabet();
+
+
+    @Query("SELECT * FROM game_table ORDER BY last_update DESC")
+    LiveData<List<Game>> getAllGamesSortedByLastUpdate();
+
+
     @Query("SELECT * FROM game_table WHERE game LIKE :searchCondition")
     LiveData<List<Game>> getFilteredGames(String searchCondition);
+
 
     @Query("SELECT * FROM game_table WHERE game_table.id == :id")
     LiveData<Game> get(int id);

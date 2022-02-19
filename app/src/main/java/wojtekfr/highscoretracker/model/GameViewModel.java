@@ -16,6 +16,8 @@ public class GameViewModel extends AndroidViewModel {
     public static GameRepository repository;
     public LiveData<List<Game>> allGames;
     public LiveData<List<Game>> filteredGames;
+    public LiveData<List<Game>> allGamesSortedByAlphabet;
+    public LiveData<List<Game>> allGamesSortedByLastUpdate;
     public String searchCondition;
     Application application;
 
@@ -36,6 +38,8 @@ public class GameViewModel extends AndroidViewModel {
         }
         allGames = repository.getAllGames();
         filteredGames = repository.getFilteredGames();
+        allGamesSortedByAlphabet = repository.getAllGamesSortedByAlphabet();
+        allGamesSortedByLastUpdate = repository.getAllGamesSortedByLastUpdate();
     }
 
     public LiveData<List<Game>> getAllGames() {
@@ -44,6 +48,14 @@ public class GameViewModel extends AndroidViewModel {
 
     public LiveData<List<Game>> getFilteredGames() {
         return filteredGames;
+    }
+
+    public LiveData<List<Game>> getAllGamesSortedByAlphabetGames() {
+        return allGamesSortedByAlphabet;
+    }
+
+    public LiveData<List<Game>> getAllGamesSortedByLastUpdate() {
+        return allGamesSortedByLastUpdate;
     }
 
     public static void insert(Game game) {

@@ -14,18 +14,24 @@ public class GameRepository {
     private GameDao gameDao;
     private LiveData<List<Game>> allGames;
     private LiveData<List<Game>> filteredGames;
+    private LiveData<List<Game>> allGamesSortedByAlphabet;
+    private LiveData<List<Game>> allGamesSortedByLastUpdate;
 
     public GameRepository(Application application, String searchCondition) {
         GameRoomDatabase db = GameRoomDatabase.getDatabase(application);
         gameDao = db.gameDao();
         allGames = gameDao.getAllGames();
         filteredGames = gameDao.getFilteredGames(searchCondition);
+        allGamesSortedByAlphabet = gameDao.getAllGamesSortedByAlphabet();
+        allGamesSortedByLastUpdate = gameDao.getAllGamesSortedByLastUpdate();
     }
 
     public LiveData<List<Game>> getAllGames() {
         return allGames;
     }
     public LiveData<List<Game>> getFilteredGames(){return filteredGames;}
+    public LiveData<List<Game>> getAllGamesSortedByAlphabet(){return allGamesSortedByAlphabet;}
+    public LiveData<List<Game>> getAllGamesSortedByLastUpdate(){return allGamesSortedByLastUpdate;}
 
     public void insert(Game game) {
         GameRoomDatabase.databaseWriterExecutor.execute(() -> {
