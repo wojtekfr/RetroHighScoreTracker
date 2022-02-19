@@ -29,8 +29,8 @@
 
     <EditText
         android:id="@+id/editTextSearchCondition"
-        android:layout_width="169dp"
-        android:layout_height="wrap_content"
+        android:layout_width="140dp"
+        android:layout_height="40dp"
         android:layout_marginStart="8dp"
         android:ems="10"
         android:hint="search"
@@ -40,8 +40,8 @@
 
     <Button
         android:id="@+id/buttonSearch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
         android:layout_marginStart="8dp"
         android:text="Search"
         app:layout_constraintStart_toEndOf="@+id/editTextSearchCondition"
@@ -49,14 +49,20 @@
 
     <Button
         android:id="@+id/buttonSearchReset"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="16dp"
+        android:layout_width="50dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="2dp"
         android:text="X"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/buttonSearch"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/buttonSort"
+        android:layout_width="70dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="2dp"
+        android:text="Button"
+        app:layout_constraintStart_toEndOf="@+id/buttonSearchReset" />
 
     <Button
         android:id="@+id/button"

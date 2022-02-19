@@ -35,12 +35,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     Button searchButton;
     Button resetSearchButton;
     EditText editTextSearchCondition;
+    Button sortButton;
     private GameViewModel gameViewModel;
     private RecyclerView recyclerView;
     private RecyclerViewAdapter recyclerViewAdapter;
     MainActivity mainActivity;
     BottomSheetFragment bottomSheetFragment;
     Button button;
+    int controlCode =0;
+    String searchCondition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         editTextSearchCondition = findViewById(R.id.editTextSearchCondition);
         resetSearchButton = findViewById(R.id.buttonSearchReset);
         button = findViewById(R.id.button);
+        sortButton = findViewById(R.id.buttonSort);
 
         gameArrayList = new ArrayList<>();
         gameViewModel = new ViewModelProvider.AndroidViewModelFactory(MainActivity.this.getApplication())
@@ -98,7 +102,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                             MainActivity.this, mainActivity);
                     recyclerView.setAdapter(recyclerViewAdapter);
                     editTextSearchCondition.setText("");
+                    controlCode = 0;
                 }));
+
+
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,10 +114,31 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             }
         });
 
+        sortButton.setOnClickListener(view -> {
+            if (controlCode == 2){
+                gameViewModel.getAllGamesSortedByLastUpdate().observe(
+                        mainActivity, games -> {
+                            recyclerViewAdapter = new RecyclerViewAdapter(games,
+                                    MainActivity.this, mainActivity);
+                            recyclerView.setAdapter(recyclerViewAdapter);
+                            editTextSearchCondition.setText("");
+                            controlCode = 3;
+                        });
+            }
+            else {
+                gameViewModel.getAllGamesSortedByAlphabetGames().observe(
+                        mainActivity, games -> {
+                            recyclerViewAdapter = new RecyclerViewAdapter(games,
+                                    MainActivity.this, mainActivity);
+                            recyclerView.setAdapter(recyclerViewAdapter);
+                            editTextSearchCondition.setText("");
+                            controlCode = 2;
+                        });
+            }
+    });
     }
-
     private void executeSearch() {
-        String searchCondition = "%" + editTextSearchCondition.getText().toString().trim() + "%";
+        searchCondition = "%" + editTextSearchCondition.getText().toString().trim() + "%";
         gameViewModel.setSearchCondition(searchCondition);
         gameViewModel.prepareResults();
         gameViewModel.getFilteredGames().observe(mainActivity, games -> {
@@ -118,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                     MainActivity.this, mainActivity);
             recyclerView.setAdapter(recyclerViewAdapter);
         });
+        controlCode = 1;
     }
 
 //    @Override
@@ -139,12 +168,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     @Override
     public void onGameClick(int position) {
         //Game game = Objects.requireNonNull(gameViewModel.allGames.getValue().get(position));
-        Game currentGame = gameViewModel.getAllGames().getValue().get(position);
+       // Game currentGame = gameViewModel.getAllGames().getValue().get(position);
+        //Log.d("xxx position", "a " + position);
+        bottomSheetFragment.setPosition(position);
+        bottomSheetFragment.setControlCode(controlCode);
+        bottomSheetFragment.setSearchCondition(searchCondition);
 
-        Log.d("xxxcurrent game", "a " + currentGame.getGameName());
-        bottomSheetFragment.setPosition(currentGame.getId());
-        Log.d("xxxposition", "a " + position);
-        Log.d("xxxcurrent game pos ", "a " + currentGame.getId());
         bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
 
         //        Intent intent = new Intent(MainActivity.this, AddGame.class);
