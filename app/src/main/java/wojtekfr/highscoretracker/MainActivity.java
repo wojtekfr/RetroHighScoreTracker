@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private RecyclerView recyclerView;
     private RecyclerViewAdapter recyclerViewAdapter;
     MainActivity mainActivity;
-    BottomSheetFragment bottomSheetFragment;
+    public static BottomSheetFragment bottomSheetFragment;
     Button button;
     int controlCode =0;
     String searchCondition;
@@ -173,11 +173,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         bottomSheetFragment.setPosition(position);
         bottomSheetFragment.setControlCode(controlCode);
         bottomSheetFragment.setSearchCondition(searchCondition);
-
         bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
+
 
         //        Intent intent = new Intent(MainActivity.this, AddGame.class);
 //        intent.putExtra("id", game.getId());
 //        startActivity(intent);
+    }
+    public static void DissmisBottomSheet(){
+        bottomSheetFragment.dismiss();
+
     }
 }

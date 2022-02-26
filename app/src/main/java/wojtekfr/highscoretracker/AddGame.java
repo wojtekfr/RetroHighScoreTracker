@@ -43,6 +43,12 @@ public class AddGame extends AppCompatActivity {
     Bitmap bmpImage;
     final int CAMERA_INTENT = 51;
 
+    public void setBottomSheetFragment(BottomSheetFragment bottomSheetFragment) {
+        this.bottomSheetFragment = bottomSheetFragment;
+    }
+
+    BottomSheetFragment bottomSheetFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,13 +113,21 @@ public class AddGame extends AppCompatActivity {
 
 
                 Date lastUpdate = new Date(System.currentTimeMillis());
-                Game game = new Game(gameName,
-                        score,
-                        note,
-                        lastUpdate);
+                Game game = null;
+                if (bmpImage == null) {
+                    game = new Game(gameName,
+                            score,
+                            note,
+                            lastUpdate);
 
+                } else {
+                    game = new Game(gameName,
+                            score,
+                            note,
+                            lastUpdate,
+                            bmpImage);
+                }
                 GameViewModel.insert(game);
-
                 finish();
             }
 
@@ -123,15 +137,17 @@ public class AddGame extends AppCompatActivity {
             if (checkIfDataCorrect()) {
 
                 Game game = prepareGameObject();
-                if (bmpImage == null) Log.d("xxx", "is null");
+
                 GameViewModel.update(game);
                 finish();
             }
         });
 
         deleteButton.setOnClickListener(view -> {
+
             Game game = prepareGameObject();
             GameViewModel.delete(game);
+
             finish();
         });
         takePhotoButton.setOnClickListener(view -> {

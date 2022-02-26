@@ -51,6 +51,10 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
     private int position = 0;
     private String searchCondition;
 
+
+
+
+
     public String getSearchCondition() {
         return searchCondition;
     }
@@ -145,6 +149,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
             Intent intent = new Intent(getContext(), AddGame.class);
             intent.putExtra("id", game.getId());
+            MainActivity.DissmisBottomSheet();
             startActivity(intent);
         });
 
