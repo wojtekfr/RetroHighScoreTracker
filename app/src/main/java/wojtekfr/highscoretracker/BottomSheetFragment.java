@@ -149,7 +149,6 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
             Intent intent = new Intent(getContext(), AddGame.class);
             intent.putExtra("id", game.getId());
-            MainActivity.DissmisBottomSheet();
             startActivity(intent);
         });
 

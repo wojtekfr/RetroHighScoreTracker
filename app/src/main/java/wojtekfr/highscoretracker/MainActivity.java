@@ -1,30 +1,28 @@
 package wojtekfr.highscoretracker;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Objects;
 
 import wojtekfr.highscoretracker.adapter.RecyclerViewAdapter;
 import wojtekfr.highscoretracker.model.Game;
 import wojtekfr.highscoretracker.model.GameViewModel;
-import wojtekfr.highscoretracker.util.Converters;
 
 // git test
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnGameClickListener {
@@ -32,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private static final int NEW_GAME_ACTIVITY_REQUEST_CODE = 1;
     private ArrayList<String> gameArrayList;
     Button addGameButton;
+    FloatingActionButton addGameFloatingButton;
     Button searchButton;
     Button resetSearchButton;
     EditText editTextSearchCondition;
@@ -42,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     MainActivity mainActivity;
     public static BottomSheetFragment bottomSheetFragment;
     Button button;
-    int controlCode =0;
+    int controlCode = 0;
     String searchCondition;
 
     @Override
@@ -54,19 +53,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         bottomSheetFragment = new BottomSheetFragment();
         ConstraintLayout constraintLayout = findViewById(R.id.bottomSheet);
 
-//        BottomSheetBehavior<ConstraintLayout> bottomSheetBehavior = BottomSheetBehavior
-//                .from(constraintLayout);
-//        bottomSheetBehavior.setPeekHeight(BottomSheetBehavior.STATE_HIDDEN);
-
         recyclerView = findViewById(R.id.recyclerViewGamesList);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         addGameButton = findViewById(R.id.buttonAddGame);
+        addGameFloatingButton = findViewById(R.id.floatingButtonAddGame);
         searchButton = findViewById(R.id.buttonSearch);
         editTextSearchCondition = findViewById(R.id.editTextSearchCondition);
         resetSearchButton = findViewById(R.id.buttonSearchReset);
-        button = findViewById(R.id.button);
         sortButton = findViewById(R.id.buttonSort);
 
         gameArrayList = new ArrayList<>();
@@ -78,54 +73,32 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         // necessary to address gameViewModel from other methods
         mainActivity = this;
 
-        gameViewModel.getAllGames().observe(this, games -> {
-            recyclerViewAdapter = new RecyclerViewAdapter(games,
-                    MainActivity.this, this);
-            recyclerView.setAdapter(recyclerViewAdapter);
-        });
+
+        setSortingByLastUpdate();
 
 
         //onClick listeners
-        addGameButton.setOnClickListener(view -> {
+        addGameFloatingButton.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, AddGame.class);
             startActivityForResult(intent, NEW_GAME_ACTIVITY_REQUEST_CODE);
         });
 
-        searchButton.setOnClickListener(view -> executeSearch());
+        searchButton.setOnClickListener(view -> {
+            executeSearch();
+            hideKeyboard(this);
+        });
 
 
         editTextSearchCondition.setOnFocusChangeListener((view, b) -> executeSearch());
 
-        resetSearchButton.setOnClickListener(view -> gameViewModel.getAllGames().observe(
-                mainActivity, games -> {
-                    recyclerViewAdapter = new RecyclerViewAdapter(games,
-                            MainActivity.this, mainActivity);
-                    recyclerView.setAdapter(recyclerViewAdapter);
-                    editTextSearchCondition.setText("");
-                    controlCode = 0;
-                }));
+        resetSearchButton.setOnClickListener(view -> setSortingByLastUpdate());
 
 
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
-            }
-        });
 
         sortButton.setOnClickListener(view -> {
-            if (controlCode == 2){
-                gameViewModel.getAllGamesSortedByLastUpdate().observe(
-                        mainActivity, games -> {
-                            recyclerViewAdapter = new RecyclerViewAdapter(games,
-                                    MainActivity.this, mainActivity);
-                            recyclerView.setAdapter(recyclerViewAdapter);
-                            editTextSearchCondition.setText("");
-                            controlCode = 3;
-                        });
-            }
-            else {
+            if (controlCode == 2) {
+                setSortingByLastUpdate();
+            } else {
                 gameViewModel.getAllGamesSortedByAlphabetGames().observe(
                         mainActivity, games -> {
                             recyclerViewAdapter = new RecyclerViewAdapter(games,
@@ -135,8 +108,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                             controlCode = 2;
                         });
             }
-    });
+        });
     }
+
     private void executeSearch() {
         searchCondition = "%" + editTextSearchCondition.getText().toString().trim() + "%";
         gameViewModel.setSearchCondition(searchCondition);
@@ -167,21 +141,47 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
     @Override
     public void onGameClick(int position) {
-        //Game game = Objects.requireNonNull(gameViewModel.allGames.getValue().get(position));
-       // Game currentGame = gameViewModel.getAllGames().getValue().get(position);
-        //Log.d("xxx position", "a " + position);
-        bottomSheetFragment.setPosition(position);
-        bottomSheetFragment.setControlCode(controlCode);
-        bottomSheetFragment.setSearchCondition(searchCondition);
-        bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
 
-
-        //        Intent intent = new Intent(MainActivity.this, AddGame.class);
-//        intent.putExtra("id", game.getId());
-//        startActivity(intent);
+//        bottomSheetFragment.setPosition(position);
+//        bottomSheetFragment.setControlCode(controlCode);
+//        bottomSheetFragment.setSearchCondition(searchCondition);
+//        bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
+//
+        Game game = null;
+        Log.d("xxx", "control code: "+ controlCode);
+        if (controlCode == 0) {
+            game = Objects.requireNonNull(gameViewModel.allGames.getValue().get(position));
+        } else if (controlCode == 1) {
+            game = Objects.requireNonNull(gameViewModel.filteredGames.getValue().get(position));
+        } else if (controlCode == 2) {
+            game = Objects.requireNonNull(gameViewModel.getAllGamesSortedByAlphabetGames().getValue().get(position));
+        } else if (controlCode == 3) {
+            game = Objects.requireNonNull(gameViewModel.getAllGamesSortedByLastUpdate().getValue().get(position));
+        }
+        Intent intent = new Intent(MainActivity.this, AddGame.class);
+        intent.putExtra("id", game.getId());
+        startActivity(intent);
     }
-    public static void DissmisBottomSheet(){
-        bottomSheetFragment.dismiss();
 
+    public void setSortingByLastUpdate() {
+        gameViewModel.getAllGamesSortedByLastUpdate().observe(
+                mainActivity, games -> {
+                    recyclerViewAdapter = new RecyclerViewAdapter(games,
+                            MainActivity.this, mainActivity);
+                    recyclerView.setAdapter(recyclerViewAdapter);
+                    editTextSearchCondition.setText("");
+                    controlCode = 3;
+                });
+    }
+
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager = (InputMethodManager) activity
+                .getSystemService(Activity.INPUT_METHOD_SERVICE);
+
+        View view = activity.getCurrentFocus();
+        if (view == null) {
+            view = new View(activity);
+        }
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }
