@@ -4,8 +4,7 @@
 
     <uses-feature
         android:name="android.hardware.camera2"
-        android:required="true"/>
-
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -14,6 +13,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HighScoreTracker">
+        <activity
+            android:name=".About"
+            android:exported="false" />
         <activity
             android:name=".AddGame"
             android:exported="false" />

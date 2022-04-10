@@ -10,12 +10,15 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -29,11 +32,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
     private static final int NEW_GAME_ACTIVITY_REQUEST_CODE = 1;
     private ArrayList<String> gameArrayList;
-    Button addGameButton;
     FloatingActionButton addGameFloatingButton;
     Button searchButton;
     Button resetSearchButton;
-    EditText editTextSearchCondition;
+
+    TextInputEditText textInputSearchCondition;
     Button sortButton;
     private GameViewModel gameViewModel;
     private RecyclerView recyclerView;
@@ -43,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     Button button;
     int controlCode = 0;
     String searchCondition;
+    TextInputLayout textInputLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,13 +60,16 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         recyclerView = findViewById(R.id.recyclerViewGamesList);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        addGameButton = findViewById(R.id.buttonAddGame);
+
         addGameFloatingButton = findViewById(R.id.floatingButtonAddGame);
         searchButton = findViewById(R.id.buttonSearch);
-        editTextSearchCondition = findViewById(R.id.editTextSearchCondition);
+
+        textInputSearchCondition = findViewById(R.id.textInputSearchCondition);
         resetSearchButton = findViewById(R.id.buttonSearchReset);
         sortButton = findViewById(R.id.buttonSort);
+        textInputLayout = findViewById(R.id.textInputLayout);
 
         gameArrayList = new ArrayList<>();
         gameViewModel = new ViewModelProvider.AndroidViewModelFactory(MainActivity.this.getApplication())
@@ -89,8 +96,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         });
 
 
-        editTextSearchCondition.setOnFocusChangeListener((view, b) -> executeSearch());
-
+        //editTextSearchCondition.setOnFocusChangeListener((view, b) -> executeSearch());
+        textInputSearchCondition.setOnFocusChangeListener((view, b) -> executeSearch());
         resetSearchButton.setOnClickListener(view -> setSortingByLastUpdate());
 
 
@@ -104,15 +111,46 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                             recyclerViewAdapter = new RecyclerViewAdapter(games,
                                     MainActivity.this, mainActivity);
                             recyclerView.setAdapter(recyclerViewAdapter);
-                            editTextSearchCondition.setText("");
+                            textInputSearchCondition.setText("");
                             controlCode = 2;
                         });
             }
         });
+
+        textInputLayout.setEndIconOnClickListener(view -> {
+            textInputSearchCondition.setText("");
+            executeSearch();
+        });
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.aboutItem) {
+            Intent intent = new Intent(MainActivity.this, About.class);
+            startActivity(intent);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
     private void executeSearch() {
-        searchCondition = "%" + editTextSearchCondition.getText().toString().trim() + "%";
+        //searchCondition = "%" + editTextSearchCondition.getText().toString().trim() + "%";
+        searchCondition = "%" + textInputSearchCondition.getText().toString().trim() + "%";
         gameViewModel.setSearchCondition(searchCondition);
         gameViewModel.prepareResults();
         gameViewModel.getFilteredGames().observe(mainActivity, games -> {
@@ -122,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         });
         controlCode = 1;
     }
+
 
 //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -169,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                     recyclerViewAdapter = new RecyclerViewAdapter(games,
                             MainActivity.this, mainActivity);
                     recyclerView.setAdapter(recyclerViewAdapter);
-                    editTextSearchCondition.setText("");
+                    textInputSearchCondition.setText("");
                     controlCode = 3;
                 });
     }

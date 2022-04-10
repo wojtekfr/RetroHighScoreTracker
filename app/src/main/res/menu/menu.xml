@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.bawp.todoister.MainActivity">
+    <item
+        android:id="@+id/aboutItem"
+        android:orderInCategory="100"
+        android:title="About app"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/clearItem"
+        android:title="Clear database" />
+</menu>
