@@ -28,21 +28,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/buttonSearchReset"
-        android:layout_width="50dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="2dp"
-        android:text="X"
-        app:layout_constraintStart_toEndOf="@+id/buttonSearch"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
         android:id="@+id/buttonSort"
         android:layout_width="70dp"
         android:layout_height="40dp"
-        android:layout_marginStart="2dp"
-        android:text="Button"
-        app:layout_constraintStart_toEndOf="@+id/buttonSearchReset" />
+        android:layout_marginStart="8dp"
+        android:text="SORT"
+        app:layout_constraintStart_toEndOf="@+id/buttonSearch"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingButtonAddGame"

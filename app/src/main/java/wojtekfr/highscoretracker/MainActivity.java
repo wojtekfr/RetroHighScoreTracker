@@ -7,14 +7,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -26,6 +29,8 @@ import java.util.Objects;
 import wojtekfr.highscoretracker.adapter.RecyclerViewAdapter;
 import wojtekfr.highscoretracker.model.Game;
 import wojtekfr.highscoretracker.model.GameViewModel;
+import wojtekfr.highscoretracker.model.MojTekst;
+import wojtekfr.highscoretracker.model.SharedModel;
 
 // git test
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnGameClickListener {
@@ -39,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     TextInputEditText textInputSearchCondition;
     Button sortButton;
     private GameViewModel gameViewModel;
+    private SharedModel sharedModel;
+
     private RecyclerView recyclerView;
     private RecyclerViewAdapter recyclerViewAdapter;
     MainActivity mainActivity;
@@ -47,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     int controlCode = 0;
     String searchCondition;
     TextInputLayout textInputLayout;
+    Dialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,25 +75,53 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         searchButton = findViewById(R.id.buttonSearch);
 
         textInputSearchCondition = findViewById(R.id.textInputSearchCondition);
-        resetSearchButton = findViewById(R.id.buttonSearchReset);
         sortButton = findViewById(R.id.buttonSort);
         textInputLayout = findViewById(R.id.textInputLayout);
 
         gameArrayList = new ArrayList<>();
         gameViewModel = new ViewModelProvider.AndroidViewModelFactory(MainActivity.this.getApplication())
                 .create(GameViewModel.class);
+
+        sharedModel = new ViewModelProvider(this).get(SharedModel.class);
+
+
         // executes results methods
         gameViewModel.prepareResults();
 
         // necessary to address gameViewModel from other methods
         mainActivity = this;
 
+        //setting dialog box for are you sure (ays)
+        dialog = new Dialog(MainActivity.this);
+        dialog.setContentView(R.layout.dialog_ays);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCancelable(false);
 
+        Button okButton = dialog.findViewById(R.id.buttonOkDialog);
+        Button cancelButton = dialog.findViewById(R.id.buttonCancelDialog);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "ok", Toast.LENGTH_SHORT).show();
+                GameViewModel.deleteAll();
+                dialog.dismiss();
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
         setSortingByLastUpdate();
 
 
         //onClick listeners
         addGameFloatingButton.setOnClickListener(view -> {
+            Log.d("xxx", sharedModel.getSelectedGame().getValue().getGameName());
+            Log.d("xxx", "tekst " + sharedModel.getMojTekst().getValue().getMojtekst());
+            Log.d("xxx", sharedModel.getMojString().getValue());
             Intent intent = new Intent(MainActivity.this, AddGame.class);
             startActivityForResult(intent, NEW_GAME_ACTIVITY_REQUEST_CODE);
         });
@@ -98,22 +134,27 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         //editTextSearchCondition.setOnFocusChangeListener((view, b) -> executeSearch());
         textInputSearchCondition.setOnFocusChangeListener((view, b) -> executeSearch());
-        resetSearchButton.setOnClickListener(view -> setSortingByLastUpdate());
-
+        //resetSearchButton.setOnClickListener(view -> setSortingByLastUpdate());
 
 
         sortButton.setOnClickListener(view -> {
+          Game game = new Game("aaa",11,"bb",null);
+          sharedModel.setSelectedGame(game);
+          MojTekst mojTekstDoUstawienia = new MojTekst("poczatkowe srutututu");
+          sharedModel.setMojTekst(mojTekstDoUstawienia);
+          String mojString = "poczatkowy string";
+          sharedModel.setMojString(mojString);
+
+
+//            bottomSheetFragment.setPosition(position);
+//            bottomSheetFragment.setControlCode(controlCode);
+//            bottomSheetFragment.setSearchCondition(searchCondition);
+            bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
+
             if (controlCode == 2) {
                 setSortingByLastUpdate();
             } else {
-                gameViewModel.getAllGamesSortedByAlphabetGames().observe(
-                        mainActivity, games -> {
-                            recyclerViewAdapter = new RecyclerViewAdapter(games,
-                                    MainActivity.this, mainActivity);
-                            recyclerView.setAdapter(recyclerViewAdapter);
-                            textInputSearchCondition.setText("");
-                            controlCode = 2;
-                        });
+                setSortingByAlphabet();
             }
         });
 
@@ -122,6 +163,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             executeSearch();
         });
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -142,10 +184,13 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             startActivity(intent);
             return true;
         }
+        if (id == R.id.clearItem) {
+            dialog.show();
+
+        }
 
         return super.onOptionsItemSelected(item);
     }
-
 
 
     private void executeSearch() {
@@ -181,13 +226,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     @Override
     public void onGameClick(int position) {
 
-//        bottomSheetFragment.setPosition(position);
-//        bottomSheetFragment.setControlCode(controlCode);
-//        bottomSheetFragment.setSearchCondition(searchCondition);
-//        bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
+
 //
         Game game = null;
-        Log.d("xxx", "control code: "+ controlCode);
+
         if (controlCode == 0) {
             game = Objects.requireNonNull(gameViewModel.allGames.getValue().get(position));
         } else if (controlCode == 1) {
@@ -213,6 +255,28 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                 });
     }
 
+    public void setSortingByAddingDate() {
+        gameViewModel.getAllGames().observe(
+                mainActivity, games -> {
+                    recyclerViewAdapter = new RecyclerViewAdapter(games,
+                            MainActivity.this, mainActivity);
+                    recyclerView.setAdapter(recyclerViewAdapter);
+                    textInputSearchCondition.setText("");
+                    controlCode = 0;
+                });
+    }
+
+    public void setSortingByAlphabet() {
+        gameViewModel.getAllGamesSortedByAlphabetGames().observe(
+                mainActivity, games -> {
+                    recyclerViewAdapter = new RecyclerViewAdapter(games,
+                            MainActivity.this, mainActivity);
+                    recyclerView.setAdapter(recyclerViewAdapter);
+                    textInputSearchCondition.setText("");
+                    controlCode = 2;
+                });
+    }
+
     public static void hideKeyboard(Activity activity) {
         InputMethodManager inputMethodManager = (InputMethodManager) activity
                 .getSystemService(Activity.INPUT_METHOD_SERVICE);
@@ -223,4 +287,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         }
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
+
+    public static void test()
+    {
+
+    };
+
+
 }

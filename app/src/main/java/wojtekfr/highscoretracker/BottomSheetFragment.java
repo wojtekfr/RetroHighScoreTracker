@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -20,15 +21,15 @@ import java.util.Objects;
 import wojtekfr.highscoretracker.adapter.RecyclerViewAdapter;
 import wojtekfr.highscoretracker.model.Game;
 import wojtekfr.highscoretracker.model.GameViewModel;
+import wojtekfr.highscoretracker.model.MojTekst;
+import wojtekfr.highscoretracker.model.SharedModel;
 
 public class BottomSheetFragment extends BottomSheetDialogFragment {
 
     private TextView gameNameTextView;
-    private ImageButton showDetailsImageButton;
-    private TextView highScoreTextView;
-    private ImageButton editImageButton;
+    private Button button;
     private GameViewModel gameViewModel;
-
+    private SharedModel sharedModel;
     public int getHighScore() {
         return highScore;
     }
@@ -36,17 +37,6 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
     private int highScore;
 
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
-    public void setHighScore(int highScore) {
-        this.highScore = highScore;
-    }
 
     private int position = 0;
     private String searchCondition;
@@ -83,11 +73,10 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.bottom_sheet, container, false);
         gameNameTextView = view.findViewById(R.id.textViewGameName);
-        showDetailsImageButton = view.findViewById(R.id.imageButtonShowDetails);
-        highScoreTextView = view.findViewById(R.id.textViewHighScore);
-        editImageButton = view.findViewById(R.id.imageButtonEdit);
-
+        button = view.findViewById(R.id.testButton);
         return view;
+
+
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -96,61 +85,55 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
                 .create(GameViewModel.class);
         gameViewModel.prepareResults();
 
+        sharedModel = new ViewModelProvider(requireActivity()).get(SharedModel.class);
+        Game game = sharedModel.getSelectedGame().getValue();
+        MojTekst mojTekst = sharedModel.getMojTekst().getValue();
+        String mojString = sharedModel.getMojString().getValue();
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("xxx", game.getGameName());
+                Log.d("xxx", "tekst bottom" + mojTekst.getMojtekst());
+                Log.d("xxx", "tekst bottom string" + mojString);
+                game.setGameName("nowa");
+                MojTekst mojTekstDoZmiany = new MojTekst("nowe srutututu");
+                String mojStringDoZmiany = "nowe string srututu";
+                sharedModel.setSelectedGame(game);
+                sharedModel.setMojTekst(mojTekstDoZmiany);
+                sharedModel.setMojString(mojStringDoZmiany);
+                dismiss();
+            }
+        });
+
 //      Game game = Objects.requireNonNull(gameViewModel.allGames.getValue().get(position));
 //      gameNameTextView.setText(game.getGameName().toString());
 
-        Log.d("xxx control code", "a " + controlCode);
-        if (controlCode == 0) {
-            gameViewModel.getAllGames().observe(this, games -> {
-                gameNameTextView.setText(games.get(position).getGameName());
-                highScore = games.get(position).getHighScore();
-            });
-        } else if (controlCode == 1) {
-            gameViewModel.setSearchCondition(searchCondition);
-            gameViewModel.prepareResults();
-            gameViewModel.getFilteredGames().observe(this, games -> {
-                gameNameTextView.setText(games.get(position).getGameName());
-                highScore = games.get(position).getHighScore();
-            });
-        } else if (controlCode == 2){
-            gameViewModel.getAllGamesSortedByAlphabetGames().observe(this, games -> {
-                gameNameTextView.setText(games.get(position).getGameName());
-                highScore = games.get(position).getHighScore();
-            });
-        } else if (controlCode ==3){
-            gameViewModel.getAllGamesSortedByLastUpdate().observe(this, games -> {
-                gameNameTextView.setText(games.get(position).getGameName());
-                highScore = games.get(position).getHighScore();
-            });
-        }
+//        Log.d("xxx control code", "a " + controlCode);
+//        if (controlCode == 0) {
+//            gameViewModel.getAllGames().observe(this, games -> {
+//                gameNameTextView.setText(games.get(position).getGameName());
+//                highScore = games.get(position).getHighScore();
+//            });
+//        } else if (controlCode == 1) {
+//            gameViewModel.setSearchCondition(searchCondition);
+//            gameViewModel.prepareResults();
+//            gameViewModel.getFilteredGames().observe(this, games -> {
+//                gameNameTextView.setText(games.get(position).getGameName());
+//                highScore = games.get(position).getHighScore();
+//            });
+//        } else if (controlCode == 2){
+//            gameViewModel.getAllGamesSortedByAlphabetGames().observe(this, games -> {
+//                gameNameTextView.setText(games.get(position).getGameName());
+//                highScore = games.get(position).getHighScore();
+//            });
+//        } else if (controlCode ==3){
+//            gameViewModel.getAllGamesSortedByLastUpdate().observe(this, games -> {
+//                gameNameTextView.setText(games.get(position).getGameName());
+//                highScore = games.get(position).getHighScore();
+//            });
+//        }
 
 
-        showDetailsImageButton.setOnClickListener(view1 -> {
-
-            highScoreTextView.setVisibility(highScoreTextView.getVisibility() ==
-                    View.GONE ? View.VISIBLE : View.GONE);
-            editImageButton.setVisibility(editImageButton.getVisibility() ==
-                    View.GONE ? View.VISIBLE : View.GONE);
-            highScoreTextView.setText(String.valueOf(highScore));
-        });
-
-        editImageButton.setOnClickListener(view12 -> {
-            Game game = null;
-            if (controlCode==0) {
-                game = Objects.requireNonNull(gameViewModel.allGames.getValue().get(position));
-            } else if (controlCode==1){
-                game = Objects.requireNonNull(gameViewModel.filteredGames.getValue().get(position));
-            } else if (controlCode==2){
-                game = Objects.requireNonNull(gameViewModel.getAllGamesSortedByAlphabetGames().getValue().get(position));
-            }
-            else if (controlCode==3){
-                game = Objects.requireNonNull(gameViewModel.getAllGamesSortedByLastUpdate().getValue().get(position));
-            }
-
-            Intent intent = new Intent(getContext(), AddGame.class);
-            intent.putExtra("id", game.getId());
-            startActivity(intent);
-        });
 
     }
 
