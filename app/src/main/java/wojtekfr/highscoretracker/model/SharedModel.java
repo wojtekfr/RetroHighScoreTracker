@@ -9,14 +9,14 @@ public class SharedModel extends ViewModel {
 
     private final MutableLiveData<MojTekst> mojTekst = new MutableLiveData<>();
 
-    private final MutableLiveData<String> mojString = new MutableLiveData<>();
+    private final MutableLiveData<Integer> selectedSorting = new MutableLiveData<>();
 
-    public void  setMojString(String string){
-        mojString.setValue(string);
+    public void setSelectedSorting(Integer integer){
+        selectedSorting.setValue(integer);
     }
 
-    public LiveData<String> getMojString(){
-        return  mojString;
+    public LiveData<Integer> getSelectedSorting(){
+        return selectedSorting;
     }
 
     public void setSelectedGame(Game game) {

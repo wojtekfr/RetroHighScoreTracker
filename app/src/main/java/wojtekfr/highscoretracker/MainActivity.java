@@ -19,6 +19,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -33,7 +34,8 @@ import wojtekfr.highscoretracker.model.MojTekst;
 import wojtekfr.highscoretracker.model.SharedModel;
 
 // git test
-public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnGameClickListener {
+public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnGameClickListener, BottomSheetFragment.ChangeSortingListener {
+
 
     private static final int NEW_GAME_ACTIVITY_REQUEST_CODE = 1;
     private ArrayList<String> gameArrayList;
@@ -49,12 +51,38 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private RecyclerView recyclerView;
     private RecyclerViewAdapter recyclerViewAdapter;
     MainActivity mainActivity;
-    public static BottomSheetFragment bottomSheetFragment;
+    public static BottomSheetDialogFragment bottomSheetFragment;
     Button button;
     int controlCode = 0;
     String searchCondition;
     TextInputLayout textInputLayout;
     Dialog dialog;
+
+    @Override
+    public void applySorting(int selectedSortingOption) {
+        Log.d("xxx", "applysortinglistener " + selectedSortingOption);
+        switch (sharedModel.getSelectedSorting().getValue()) {
+            case R.id.radioButtonNoSort:
+                Log.d("xxx", "radio no sort");
+                setSortingByAddingDate();
+                break;
+            case R.id.radioButtonSortByName:
+                Log.d("xxx", "radio sort by name");
+                setSortingByAlphabet();
+                break;
+            case R.id.radioButtonSortByLastUpdate:
+                Log.d("xxx", "radio sort by last update");
+                setSortingByLastUpdate();
+                break;
+        }
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("xxx", "resume");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +92,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         bottomSheetFragment = new BottomSheetFragment();
         ConstraintLayout constraintLayout = findViewById(R.id.bottomSheet);
+
+
+
 
         recyclerView = findViewById(R.id.recyclerViewGamesList);
         recyclerView.setHasFixedSize(true);
@@ -119,9 +150,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         //onClick listeners
         addGameFloatingButton.setOnClickListener(view -> {
-            Log.d("xxx", sharedModel.getSelectedGame().getValue().getGameName());
-            Log.d("xxx", "tekst " + sharedModel.getMojTekst().getValue().getMojtekst());
-            Log.d("xxx", sharedModel.getMojString().getValue());
+
+
+
+
             Intent intent = new Intent(MainActivity.this, AddGame.class);
             startActivityForResult(intent, NEW_GAME_ACTIVITY_REQUEST_CODE);
         });
@@ -137,13 +169,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         //resetSearchButton.setOnClickListener(view -> setSortingByLastUpdate());
 
 
+
         sortButton.setOnClickListener(view -> {
           Game game = new Game("aaa",11,"bb",null);
           sharedModel.setSelectedGame(game);
           MojTekst mojTekstDoUstawienia = new MojTekst("poczatkowe srutututu");
           sharedModel.setMojTekst(mojTekstDoUstawienia);
           String mojString = "poczatkowy string";
-          sharedModel.setMojString(mojString);
+
 
 
 //            bottomSheetFragment.setPosition(position);
@@ -151,11 +184,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 //            bottomSheetFragment.setSearchCondition(searchCondition);
             bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
 
-            if (controlCode == 2) {
-                setSortingByLastUpdate();
-            } else {
-                setSortingByAlphabet();
-            }
+
+
         });
 
         textInputLayout.setEndIconOnClickListener(view -> {
