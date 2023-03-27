@@ -50,7 +50,6 @@ public class Game {
         this.highScore = highScore;
         this.note = note;
         this.lastUpdate = lastUpdate;
-        this.image = image;
 
     }
 
@@ -64,13 +63,7 @@ public class Game {
         this.lastUpdate = lastUpdate;
     }
 
-
-
-
-
-
     public Game(String gameName, int highScore) {
-        this.id = id;
         this.gameName = gameName;
         this.highScore = highScore;
     }
