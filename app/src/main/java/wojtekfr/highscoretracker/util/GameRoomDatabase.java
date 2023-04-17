@@ -44,17 +44,17 @@ public abstract class GameRoomDatabase extends RoomDatabase {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
-            databaseWriterExecutor.execute(() -> {
-                GameDao gameDao = INSTANCE.gameDao();
-                gameDao.deleteAll();
+ //           databaseWriterExecutor.execute(() -> {
+//                GameDao gameDao = INSTANCE.gameDao();
+//                gameDao.deleteAll();
+//
+//                Game game = new Game("Mario", 1);
+//                gameDao.insert(game);
+//                game = new Game("Wario", 2);
+//                game.setNote("note");
+//                gameDao.insert(game);
 
-                Game game = new Game("Mario", 1);
-                gameDao.insert(game);
-                game = new Game("Wario", 2);
-                game.setNote("note");
-                gameDao.insert(game);
-
-            });
+ //           });
         }
     };
 

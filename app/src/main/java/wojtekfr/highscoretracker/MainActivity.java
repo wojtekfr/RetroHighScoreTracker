@@ -1,5 +1,6 @@
 package wojtekfr.highscoretracker;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -8,7 +9,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,7 +35,7 @@ import wojtekfr.highscoretracker.model.GameViewModel;
 
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnGameClickListener, BottomSheetFragment.ChangeSortingListener {
 
-
+    private  int controlCode;
     private static final int NEW_GAME_ACTIVITY_REQUEST_CODE = 1;
     private ArrayList<String> gameArrayList;
     FloatingActionButton addGameFloatingButton;
@@ -40,13 +43,22 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
     TextInputEditText textInputSearchCondition;
     Button sortButton;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+//Log.d("xxx", "wrociłem do main i control code " + controlCode);
+      ///  gameViewModel.prepareResults();
+//        setSortingByLastUpdate();
+    }
+
     private GameViewModel gameViewModel;
 
     private RecyclerView recyclerView;
     private RecyclerViewAdapter recyclerViewAdapter;
     MainActivity mainActivity;
     public static BottomSheetDialogFragment bottomSheetFragment;
-    int controlCode = 0;
+
     String searchCondition;
     TextInputLayout textInputLayout;
     Dialog dialog;
@@ -69,11 +81,20 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        SharedPreferences getSharedData = getSharedPreferences("showSplashPref", MODE_PRIVATE);
+        boolean showSplashCreen = getSharedData.getBoolean("showSplash",true);
+        //Log.d("xxx", "show splash" + showSplashCreen);
+        if (showSplashCreen) {
+            Intent intent2 = new Intent(MainActivity.this, SplashShreen.class);
+            startActivity(intent2);
+        }
+        //Log.d("xxx", "startowy control code " + controlCode);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
 
-        bottomSheetFragment = new BottomSheetFragment();
+
 
         recyclerView = findViewById(R.id.recyclerViewGamesList);
         recyclerView.setHasFixedSize(true);
@@ -101,6 +122,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         // necessary to address gameViewModel from other methods
         mainActivity = this;
 
+        setSortingByLastUpdate();
+        //Log.d("xxx", "controlcode po domyslnym sortowaniu" + controlCode);
+        BottomSheetFragment bottomSheetFragment = new BottomSheetFragment();
+
         //setting dialog box for are you sure (ays)
         dialog = new Dialog(MainActivity.this);
         dialog.setContentView(R.layout.dialog_ays);
@@ -109,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         Button okButton = dialog.findViewById(R.id.buttonOkDialog);
         Button cancelButton = dialog.findViewById(R.id.buttonCancelDialog);
-        setSortingByLastUpdate();
+
 
 
         //onClick listeners
@@ -132,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         addGameFloatingButton.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, AddGame.class);
             startActivityForResult(intent, NEW_GAME_ACTIVITY_REQUEST_CODE);
+
         });
 
         searchButton.setOnClickListener(view -> {
@@ -142,15 +168,19 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         textInputSearchCondition.setOnFocusChangeListener((view, b) -> executeSearchByEnteredString());
 
         sortButton.setOnClickListener(view -> {
+            //Log.d("xxx", "control code w bottom listener "+ controlCode);
+            bottomSheetFragment.setControlCode(controlCode);
             bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
 
 
         });
 
         textInputLayout.setEndIconOnClickListener(view -> {
+            //Log.d("qqq","yyy");
             textInputSearchCondition.setText("");
             executeSearchByEnteredString();
         });
+        //Log.d("xxx", "controlcode chwile po domyslnym sortowaniu" + controlCode);
     }
 
     @Override
@@ -169,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.aboutItem) {
-            Intent intent = new Intent(MainActivity.this, About.class);
+            Intent intent = new Intent(MainActivity.this, SplashShreen.class);
             startActivity(intent);
             return true;
         }
@@ -183,14 +213,22 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
     @Override
     public void onGameClick(int position) {
+        //Log.d("xxx","control code = " + controlCode);
+        //Log.d("xxx", "id klieknietej gry to = " + position);
+
         Game game = null;
         if (controlCode == 0) {
-            game = Objects.requireNonNull(gameViewModel.allGames.getValue().get(position));
+            //Log.d("xxx", " wielkość " + Objects.requireNonNull(gameViewModel.getAllGames().getValue().size()));
+            game = Objects.requireNonNull(gameViewModel.getAllGames().getValue().get(position));
         } else if (controlCode == 1) {
-            game = Objects.requireNonNull(gameViewModel.filteredGames.getValue().get(position));
+            //Log.d("xxx", " wielkość " + Objects.requireNonNull(gameViewModel.getFilteredGames().getValue().size()));
+            game = Objects.requireNonNull(gameViewModel.getFilteredGames().getValue().get(position));
         } else if (controlCode == 2) {
+            //Log.d("xxx", " wielkość " + Objects.requireNonNull(gameViewModel.getAllGamesSortedByAlphabetGames().getValue().size()));
             game = Objects.requireNonNull(gameViewModel.getAllGamesSortedByAlphabetGames().getValue().get(position));
         } else if (controlCode == 3) {
+            //Log.d("xxx", " wielkość " + Objects.requireNonNull(gameViewModel.getAllGamesSortedByLastUpdate().getValue().size()));
+           // game = Objects.requireNonNull(Objects.requireNonNull(gameViewModel.getAllGamesSortedByLastUpdate().getValue()).get(position));
             game = Objects.requireNonNull(gameViewModel.getAllGamesSortedByLastUpdate().getValue().get(position));
         }
         Intent intent = new Intent(MainActivity.this, AddGame.class);
@@ -201,29 +239,46 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     //sorting methods
 
     private void executeSearchByEnteredString() {
-        searchCondition = "%" + textInputSearchCondition.getText().toString().trim() + "%";
-        gameViewModel.setSearchCondition(searchCondition);
-        gameViewModel.prepareResults();
-        gameViewModel.getFilteredGames().observe(mainActivity, games -> {
-            recyclerViewAdapter = new RecyclerViewAdapter(games,
-                    MainActivity.this, mainActivity);
-            recyclerView.setAdapter(recyclerViewAdapter);
-        });
-        controlCode = 1;
+        //Log.d("xxx", "ustawiam executeSearchByEnteredString");
+        //Log.d("xxx", "seach condition " + textInputSearchCondition.getText().toString().trim());
+        if (!textInputSearchCondition.getText().toString().trim().isEmpty()) {
+            //Log.d("xxx", "nie jest puste");
+            searchCondition = "%" + textInputSearchCondition.getText().toString().trim() + "%";
+            gameViewModel.setSearchCondition(searchCondition);
+            gameViewModel.prepareResults();
+
+            gameViewModel.getFilteredGames().observe(mainActivity, games -> {
+                //Log.d("xxx", "wykonuje  getFilteredGames");
+                recyclerViewAdapter = new RecyclerViewAdapter(games,
+                        MainActivity.this, mainActivity);
+                recyclerView.setAdapter(recyclerViewAdapter);
+                controlCode = 1;
+            });
+        } else {
+            //Log.d("xxx", "resetuje do domyslneg sortowania czyli 3");
+           setSortingByLastUpdate();
+        }
     }
 
     public void setSortingByLastUpdate() {
+
         gameViewModel.getAllGamesSortedByLastUpdate().observe(
+
                 mainActivity, games -> {
+
                     recyclerViewAdapter = new RecyclerViewAdapter(games,
                             MainActivity.this, mainActivity);
                     recyclerView.setAdapter(recyclerViewAdapter);
                     textInputSearchCondition.setText("");
-                    controlCode = 3;
+
+                    //Log.d("xxx", "control code  zaraz po dom srt " + controlCode);
                 });
+        controlCode = 3;
     }
 
     public void setSortingByAddingDate() {
+        //Log.d("xxx", "ustawiam setSortingByAddingDate");
+
         gameViewModel.getAllGames().observe(
                 mainActivity, games -> {
                     recyclerViewAdapter = new RecyclerViewAdapter(games,
@@ -235,6 +290,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     }
 
     public void setSortingByAlphabet() {
+        //Log.d("xxx", "ustawiam setSortingByAlphabet");
+
         gameViewModel.getAllGamesSortedByAlphabetGames().observe(
                 mainActivity, games -> {
                     recyclerViewAdapter = new RecyclerViewAdapter(games,
