@@ -139,6 +139,7 @@ public class AddGame extends AppCompatActivity {
                 Game game = prepareGameObject();
 
                 GameViewModel.update(game);
+              Log.d("xxqq", " teraz update finish");
                 finish();
             }
         });
