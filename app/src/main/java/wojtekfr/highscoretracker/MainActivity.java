@@ -12,12 +12,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
@@ -58,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
     String searchCondition;
     TextInputLayout textInputLayout;
+    EditText textInput;
     Dialog dialog;
 
 
@@ -96,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         textInputSearchCondition = findViewById(R.id.textInputSearchCondition);
         sortButton = findViewById(R.id.buttonSort);
         textInputLayout = findViewById(R.id.textInputLayout);
-
+        textInput = findViewById(R.id.textInputSearchCondition);
         //gameViewModel setup
         gameArrayList = new ArrayList<>();
         gameViewModel = new ViewModelProvider.AndroidViewModelFactory(MainActivity.this.getApplication())
@@ -173,7 +177,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             executeSearchByEnteredString();
         });
         //Log.d("xxx", "controlcode chwile po domyslnym sortowaniu" + controlCode);
+textInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+    @Override
+    public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
 
+        executeSearchByEnteredString();
+        hideKeyboard(mainActivity);
+        return false;
+    }
+});
     }
 
 
