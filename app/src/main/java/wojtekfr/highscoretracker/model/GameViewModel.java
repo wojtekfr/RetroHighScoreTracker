@@ -19,6 +19,7 @@ public class GameViewModel extends AndroidViewModel {
     public LiveData<List<Game>> allGamesSortedByAlphabet;
     public LiveData<List<Game>> allGamesSortedByLastUpdate;
     public String searchCondition;
+    public LiveData<Integer> gameCount;
     Application application;
 
     public GameViewModel(@NonNull Application application) {
@@ -40,6 +41,7 @@ public class GameViewModel extends AndroidViewModel {
         filteredGames = repository.getFilteredGames();
         allGamesSortedByAlphabet = repository.getAllGamesSortedByAlphabet();
         allGamesSortedByLastUpdate = repository.getAllGamesSortedByLastUpdate();
+        gameCount = repository.getCountGames();
     }
 
     public LiveData<List<Game>> getAllGames() {

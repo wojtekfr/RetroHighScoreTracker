@@ -1,12 +1,17 @@
 package wojtekfr.highscoretracker;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -42,6 +47,7 @@ public class AddGame extends AppCompatActivity {
     ImageView imageView;
     Bitmap bmpImage;
     final int CAMERA_INTENT = 51;
+    private static final int MY_CAMERA_REQUEST_CODE = 100;
 
     public void setBottomSheetFragment(BottomSheetFragment bottomSheetFragment) {
         this.bottomSheetFragment = bottomSheetFragment;
@@ -128,6 +134,7 @@ public class AddGame extends AppCompatActivity {
                             bmpImage);
                 }
                 GameViewModel.insert(game);
+                MainActivity.hideKeyboard(this);
                 finish();
             }
 
@@ -139,7 +146,8 @@ public class AddGame extends AppCompatActivity {
                 Game game = prepareGameObject();
 
                 GameViewModel.update(game);
-              Log.d("xxqq", " teraz update finish");
+            //  Log.d("xxqq", " teraz update finish");
+                MainActivity.hideKeyboard(this);
                 finish();
             }
         });
@@ -148,19 +156,56 @@ public class AddGame extends AppCompatActivity {
 
             Game game = prepareGameObject();
             GameViewModel.delete(game);
-
+            MainActivity.hideKeyboard(this);
             finish();
         });
         takePhotoButton.setOnClickListener(view -> {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (intent.resolveActivity(getPackageManager()) != null) {
-                startActivityForResult(intent, CAMERA_INTENT);
+            boolean photoActivityAlreadyInitated = false;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_REQUEST_CODE);
+                } else
+                {
+                //   Log.d("xxx", "pierwsze zdjęcie");
+                   photoActivityAlreadyInitated = true;
+                    startPhotoActivity();
+                }
             }
+
+            if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0);}
+            else
+            {
+              //  Log.d("xxx", "drugie zdjęcie");
+                if (!photoActivityAlreadyInitated){
+                    startPhotoActivity();}
+            }
+
 
 
         });
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_CAMERA_REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startPhotoActivity();
+                }
+            } else {
+                Toast.makeText(this, "camera permission not yet granted", Toast.LENGTH_LONG).show();
+            }
+        }
+
+
+    private void startPhotoActivity() {
+       // Log.d("xxx", " robie zdjece");
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(intent, CAMERA_INTENT);
+        }
+    }
     private Game prepareGameObject() {
         Game game = new Game(gameEditText.getText().toString().trim(),
                 Integer.valueOf(scoreEditText.getText().toString().trim()),

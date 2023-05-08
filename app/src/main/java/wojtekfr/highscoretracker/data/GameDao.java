@@ -23,7 +23,7 @@ public interface GameDao {
     @Query("SELECT * FROM game_table")
     LiveData<List<Game>> getAllGames();
 
-    @Query("SELECT * FROM game_table ORDER BY game ASC")
+    @Query("SELECT * FROM game_table  ORDER BY game COLLATE NOCASE ASC ")
     LiveData<List<Game>> getAllGamesSortedByAlphabet();
 
 
@@ -31,7 +31,7 @@ public interface GameDao {
     LiveData<List<Game>> getAllGamesSortedByLastUpdate();
 
 
-    @Query("SELECT * FROM game_table WHERE game LIKE :searchCondition")
+    @Query("SELECT * FROM game_table WHERE game LIKE :searchCondition ORDER BY game COLLATE NOCASE ASC")
     LiveData<List<Game>> getFilteredGames(String searchCondition);
 
 
@@ -44,7 +44,7 @@ public interface GameDao {
     @Delete
     void delete(Game game);
 
-
-
+    @Query("SELECT COUNT(id) FROM game_table")
+    LiveData<Integer> countGames();
 
 }

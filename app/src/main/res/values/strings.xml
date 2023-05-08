@@ -12,10 +12,17 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="aboutText">
-        Do you like to play retro arcade games on real old computer or console?
-        You can use this app to register your game results from any game.
-        Than you can compare current result with the app and update it if you got HIGH SCORE.
-        Register as many games as you want.
-        You can also add screen shot if you like to have a proof.\n\n
-        Share your suggestions frabidev@gmail.com</string>
+        0 REM This app is designed to track your high scores from retro games
+        \n\n1 REM It is useful especially for playing on real old computers and consoles,
+        \n\n2 REM as often such software does not allow any other way to save your high score
+        \n\n10 PRINT \u0022Play your retro game\u0022
+        \n\n20 PRINT \u0022get a HIGH SCORE\u0022
+        \n\n30 INPUT \u0022Add a game and high score\u0022; GAME$, SCO%
+        \n\n40 REM You can add optional note and picture of title screen
+        \n\n50 PRINT \u0022Play again and beat your HIGH SCORE\u0022
+        \n\n60 INPUT \u0022Update your HIGH SCORE\u0022; SCO%
+        \n\n70 GOTO 50
+
+    </string>
+    <string name="firstTimeAddingText">Add first game</string>
 </resources>

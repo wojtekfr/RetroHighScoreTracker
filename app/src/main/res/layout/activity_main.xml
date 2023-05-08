@@ -34,10 +34,9 @@
                 android:layout_width="150dp"
                 android:layout_height="match_parent"
                 android:hint="name of game"
-                android:singleLine="true"
-                android:textSize="11sp"
                 android:imeOptions="actionDone"
-                />
+                android:singleLine="true"
+                android:textSize="11sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -86,6 +85,28 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_input_add" />
+
+
+    <TextView
+        android:id="@+id/textViewAddFirstGameHelper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="75dp"
+        android:text="@string/firstTimeAddingText"
+        android:textSize="30sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imageViewFirstGameArrowImageView" />
+
+    <ImageView
+        android:id="@+id/imageViewFirstGameArrowImageView"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginBottom="75dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/floatingButtonAddGame"
+        app:srcCompat="@drawable/baseline_arrow_forward_24" />
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
