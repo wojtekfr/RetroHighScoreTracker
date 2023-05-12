@@ -43,6 +43,7 @@ import java.util.Objects;
 import wojtekfr.highscoretracker.adapter.RecyclerViewAdapter;
 import wojtekfr.highscoretracker.model.Game;
 import wojtekfr.highscoretracker.model.GameViewModel;
+import wojtekfr.highscoretracker.util.CurrentSorting;
 
 
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnGameClickListener, BottomSheetFragment.ChangeSortingListener {
@@ -70,11 +71,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     TextView textNewGameHelp;
     ImageView arrowImage;
 
+    CurrentSorting currentSorting = CurrentSorting.LASTUPDATE;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         //ads
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
@@ -97,10 +101,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         //Log.d("xxx", "startowy control code " + controlCode);
 
         //setting up UI
-        recyclerView = findViewById(R.id.recyclerViewGamesList);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+       // recyclerView.setLayoutManager(new LinearLayoutManager(this));
         addGameFloatingButton = findViewById(R.id.floatingButtonAddGame);
         searchButton = findViewById(R.id.buttonSearch);
         textInputSearchCondition = findViewById(R.id.textInputSearchCondition);
@@ -110,10 +112,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         textNewGameHelp = findViewById(R.id.textViewAddFirstGameHelper);
         arrowImage = findViewById(R.id.imageViewFirstGameArrowImageView);
 
+        recyclerView = findViewById(R.id.recyclerViewGamesList);
 
 
         //gameViewModel setup
-        gameArrayList = new ArrayList<>();
+        //gameArrayList = new ArrayList<>();
         gameViewModel = new ViewModelProvider.AndroidViewModelFactory(MainActivity.this.getApplication())
                 .create(GameViewModel.class);
         // executes results methods
@@ -124,7 +127,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         mainActivity = this;
 
         refreshSorting();
-
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         //setSortingByLastUpdate();
         //Log.d("xxx", "controlcode po domyslnym sortowaniu" + controlCode);
         //setting up bottomSheet for sorting
@@ -178,6 +182,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         sortButton.setOnClickListener(view -> {
             //Log.d("xxx", "control code w bottom listener "+ controlCode);
             bottomSheetFragment.setControlCode(controlCode);
+            bottomSheetFragment.setCurrentSorting(currentSorting);
             bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
 
 
@@ -189,22 +194,22 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             executeSearchByEnteredString();
         });
         //Log.d("xxx", "controlcode chwile po domyslnym sortowaniu" + controlCode);
-textInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-    @Override
-    public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+        textInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
 
-        executeSearchByEnteredString();
-        hideKeyboard(mainActivity);
-        return false;
-    }
-});
+                executeSearchByEnteredString();
+                hideKeyboard(mainActivity);
+                return false;
+            }
+        });
     }
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        gameViewModel.gameCount.observe(mainActivity, count ->{
+        gameViewModel.gameCount.observe(mainActivity, count -> {
             Integer aaa = count;
             Log.d("xxxqq", "ssizex " + aaa);
         });
@@ -213,9 +218,8 @@ textInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
         checkIfHelperToBeShowed();
         hideKeyboard(this);
 
-
         //Log.d("xxqq", "wrociłem do main i control code " + controlCode +
-          //       "a request code " + requestCode + " a result code " + resultCode);
+        //       "a request code " + requestCode + " a result code " + resultCode);
         refreshSorting();
         ///  gameViewModel.prepareResults();
 //        setSortingByLastUpdate();
@@ -223,14 +227,14 @@ textInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
     private void checkIfHelperToBeShowed() {
 
-        gameViewModel.gameCount.observe(mainActivity, count ->{
+        gameViewModel.gameCount.observe(mainActivity, count -> {
 
-            if (count!=0){
+            if (count != 0) {
                 textNewGameHelp.setVisibility(View.GONE);
                 arrowImage.clearAnimation();
                 arrowImage.setVisibility(View.GONE);
-            } else
-            { textNewGameHelp.setVisibility(View.VISIBLE);
+            } else {
+                textNewGameHelp.setVisibility(View.VISIBLE);
                 arrowImage.setVisibility(View.VISIBLE);
                 Animation animation = new AlphaAnimation(1, 0); //to change visibility from visible to invisible
                 animation.setDuration(1000); //1 second duration for each animation cycle
@@ -277,24 +281,41 @@ textInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
     @Override
     public void onGameClick(int position) {
-    //    Log.d("xxx","control code = " + controlCode);
-        //Log.d("xxx", "id klieknietej gry to = " + position);
+        Log.d("xxx", "control code = " + controlCode);
+        Log.d("xxx", "sortint = " + currentSorting);
+        Log.d("xxx", "id klieknietej gry to = " + position);
 
         Game game = null;
-        if (controlCode == 0) {
-           // Log.d("xxx", " wielkość " + Objects.requireNonNull(gameViewModel.getAllGames().getValue().size()));
-            game = Objects.requireNonNull(gameViewModel.getAllGames().getValue().get(position));
-        } else if (controlCode == 1) {
-           // Log.d("xxx", " wielkość " + Objects.requireNonNull(gameViewModel.getFilteredGames().getValue().size()));
-            game = Objects.requireNonNull(gameViewModel.getFilteredGames().getValue().get(position));
-        } else if (controlCode == 2) {
-            //Log.d("xxx", " wielkość " + Objects.requireNonNull(gameViewModel.getAllGamesSortedByAlphabetGames().getValue().size()));
-            game = Objects.requireNonNull(gameViewModel.getAllGamesSortedByAlphabetGames().getValue().get(position));
-        } else if (controlCode == 3) {
-            //Log.d("xxx", " wielkość " + Objects.requireNonNull(gameViewModel.getAllGamesSortedByLastUpdate().getValue().size()));
-            // game = Objects.requireNonNull(Objects.requireNonNull(gameViewModel.getAllGamesSortedByLastUpdate().getValue()).get(position));
-            game = Objects.requireNonNull(gameViewModel.getAllGamesSortedByLastUpdate().getValue().get(position));
+        switch (currentSorting) {
+            case ADDINGDATE:
+                game = Objects.requireNonNull(gameViewModel.getAllGames().getValue().get(position));
+                break;
+            case ENTEREDSTRING:
+                game = Objects.requireNonNull(gameViewModel.getFilteredGames().getValue().get(position));
+                break;
+            case ALPHABET:
+                game = Objects.requireNonNull(gameViewModel.getAllGamesSortedByAlphabetGames().getValue().get(position));
+                break;
+            case LASTUPDATE:
+                game = Objects.requireNonNull(gameViewModel.getAllGamesSortedByLastUpdate().getValue().get(position));
+
+
         }
+
+        //        if (controlCode == 0) {
+//           // Log.d("xxx", " wielkość " + Objects.requireNonNull(gameViewModel.getAllGames().getValue().size()));
+//            game = Objects.requireNonNull(gameViewModel.getAllGames().getValue().get(position));
+//        } else if (controlCode == 1) {
+//           // Log.d("xxx", " wielkość " + Objects.requireNonNull(gameViewModel.getFilteredGames().getValue().size()));
+//            game = Objects.requireNonNull(gameViewModel.getFilteredGames().getValue().get(position));
+//        } else if (controlCode == 2) {
+//            //Log.d("xxx", " wielkość " + Objects.requireNonNull(gameViewModel.getAllGamesSortedByAlphabetGames().getValue().size()));
+//            game = Objects.requireNonNull(gameViewModel.getAllGamesSortedByAlphabetGames().getValue().get(position));
+//        } else if (controlCode == 3) {
+//            //Log.d("xxx", " wielkość " + Objects.requireNonNull(gameViewModel.getAllGamesSortedByLastUpdate().getValue().size()));
+//            // game = Objects.requireNonNull(Objects.requireNonNull(gameViewModel.getAllGamesSortedByLastUpdate().getValue()).get(position));
+//            game = Objects.requireNonNull(gameViewModel.getAllGamesSortedByLastUpdate().getValue().get(position));
+//        }
         Intent intent = new Intent(MainActivity.this, AddGame.class);
         intent.putExtra("id", game.getId());
         startActivity(intent);
@@ -325,14 +346,14 @@ textInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             searchCondition = "%" + textInputSearchCondition.getText().toString().trim() + "%";
             gameViewModel.setSearchCondition(searchCondition);
             gameViewModel.prepareResults();
-
             gameViewModel.getFilteredGames().observe(mainActivity, games -> {
                 //Log.d("xxx", "wykonuje  getFilteredGames");
                 recyclerViewAdapter = new RecyclerViewAdapter(games,
                         MainActivity.this, mainActivity);
                 recyclerView.setAdapter(recyclerViewAdapter);
-                controlCode = 1;
             });
+            controlCode = 1;
+            currentSorting =currentSorting.ENTEREDSTRING;
         } else {
             //Log.d("xxx", "resetuje do domyslneg sortowania czyli 3");
             setSortingByLastUpdate();
@@ -340,11 +361,9 @@ textInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
     }
 
     public void setSortingByLastUpdate() {
-       // Log.d("xxx", "wykonujesortingbylastupdate");
+        Log.d("xxx", "wykonujesortingbylastupdate");
         gameViewModel.getAllGamesSortedByLastUpdate().observe(
-
                 mainActivity, games -> {
-
                     recyclerViewAdapter = new RecyclerViewAdapter(games,
                             MainActivity.this, mainActivity);
                     recyclerView.setAdapter(recyclerViewAdapter);
@@ -353,10 +372,11 @@ textInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                     //Log.d("xxx", "control code  zaraz po dom srt " + controlCode);
                 });
         controlCode = 3;
+        currentSorting = currentSorting.LASTUPDATE;
     }
 
     public void setSortingByAddingDate() {
-     //   Log.d("xxx", "ustawiam setSortingByAddingDate");
+        Log.d("xxx", "ustawiam setSortingByAddingDate");
 
         gameViewModel.getAllGames().observe(
                 mainActivity, games -> {
@@ -364,12 +384,14 @@ textInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                             MainActivity.this, mainActivity);
                     recyclerView.setAdapter(recyclerViewAdapter);
                     textInputSearchCondition.setText("");
-                    controlCode = 0;
+
                 });
+        controlCode = 0;
+        currentSorting = currentSorting.ADDINGDATE;
     }
 
     public void setSortingByAlphabet() {
-    //    Log.d("xxx", "ustawiam setSortingByAlphabet");
+        Log.d("xxx", "ustawiam setSortingByAlphabet");
 
         gameViewModel.getAllGamesSortedByAlphabetGames().observe(
                 mainActivity, games -> {
@@ -377,44 +399,46 @@ textInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                             MainActivity.this, mainActivity);
                     recyclerView.setAdapter(recyclerViewAdapter);
                     textInputSearchCondition.setText("");
-                    controlCode = 2;
+
                 });
+        controlCode = 2;
+        currentSorting = currentSorting.ALPHABET;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-       // Log.d("xxqq", " resume");
+        // Log.d("xxqq", " resume");
         refreshSorting();
         checkIfHelperToBeShowed();
         hideKeyboard(this);
     }
 
     private void refreshSorting() {
-       // Log.d("xxqq", "sorting refreshed");
+        // Log.d("xxqq", "sorting refreshed");
         gameViewModel.prepareResults();
-        switch (controlCode) {
-            case 0:
+        switch (currentSorting) {
+            case ADDINGDATE:
                 //   Log.d("xxqq", "refresh control code " + controlCode + " byaddingdate");
                 setSortingByAddingDate();
                 break;
-            case 1:
+            case ENTEREDSTRING:
                 // Log.d("xxqq", "refresh control code " + controlCode + " byeneredstring");
                 //Log.d("xxqq", "searchCondition " + searchCondition);
                 executeSearchByEnteredString();
                 break;
-            case 2:
+            case ALPHABET:
                 //Log.d("xxqq", "refresh control code " + controlCode + " byAlphabet");
                 setSortingByAlphabet();
                 break;
-            case 3:
+            case LASTUPDATE:
                 //Log.d("xxqq", "refresh control code " + controlCode + " bylastupdate");
                 setSortingByLastUpdate();
                 break;
         }
 
 
-     //   Log.d("xxxqq", "size " + gameViewModel.gameCount.getValue());
+        //   Log.d("xxxqq", "size " + gameViewModel.gameCount.getValue());
     }
 
 

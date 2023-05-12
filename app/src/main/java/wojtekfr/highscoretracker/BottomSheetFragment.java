@@ -15,19 +15,26 @@ import androidx.annotation.NonNull;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import wojtekfr.highscoretracker.util.CurrentSorting;
+
 public class BottomSheetFragment extends BottomSheetDialogFragment {
 
 
 
     public int controlCode;
+    public CurrentSorting currentSorting;
     public ChangeSortingListener changeSortingListener;
     private Button okButton;
     private RadioGroup radioGroup;
+
 
     public void setControlCode(int controlCode) {
         this.controlCode = controlCode;
     }
 
+    public void setCurrentSorting(CurrentSorting currentSorting) {
+        this.currentSorting= currentSorting;
+    }
 
     public BottomSheetFragment() {
     }
@@ -63,14 +70,14 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
 
         Log.d("xxx", "kod w bottom " + controlCode);
-        switch (controlCode){
-            case 0:
+        switch (currentSorting){
+            case ADDINGDATE:
                 ((RadioButton) radioGroup.getChildAt(0)).setChecked(true);
                 break;
-            case 2:
+            case ALPHABET:
                 ((RadioButton) radioGroup.getChildAt(1)).setChecked(true);
                 break;
-            case 3:
+            case LASTUPDATE:
                 ((RadioButton) radioGroup.getChildAt(2)).setChecked(true);
                 break;
         }
