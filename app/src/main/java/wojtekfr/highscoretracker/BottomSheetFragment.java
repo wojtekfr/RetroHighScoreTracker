@@ -21,16 +21,14 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
 
 
 
-    public int controlCode;
+
     public CurrentSorting currentSorting;
     public ChangeSortingListener changeSortingListener;
     private Button okButton;
     private RadioGroup radioGroup;
 
 
-    public void setControlCode(int controlCode) {
-        this.controlCode = controlCode;
-    }
+
 
     public void setCurrentSorting(CurrentSorting currentSorting) {
         this.currentSorting= currentSorting;
@@ -69,7 +67,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
 
-        Log.d("xxx", "kod w bottom " + controlCode);
+
         switch (currentSorting){
             case ADDINGDATE:
                 ((RadioButton) radioGroup.getChildAt(0)).setChecked(true);

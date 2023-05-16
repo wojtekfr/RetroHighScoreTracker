@@ -48,7 +48,7 @@ import wojtekfr.highscoretracker.util.CurrentSorting;
 
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnGameClickListener, BottomSheetFragment.ChangeSortingListener {
     private AdView mAdView;
-    private int controlCode = 3;
+
     private static final int NEW_GAME_ACTIVITY_REQUEST_CODE = 1;
     private ArrayList<String> gameArrayList;
     FloatingActionButton addGameFloatingButton;
@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         sortButton.setOnClickListener(view -> {
             //Log.d("xxx", "control code w bottom listener "+ controlCode);
-            bottomSheetFragment.setControlCode(controlCode);
+
             bottomSheetFragment.setCurrentSorting(currentSorting);
             bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
 
@@ -210,19 +210,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         gameViewModel.gameCount.observe(mainActivity, count -> {
-            Integer aaa = count;
-            Log.d("xxxqq", "ssizex " + aaa);
+
         });
-        Integer aaa = gameViewModel.gameCount.getValue();
-        Log.d("xxxqq", "ssize " + aaa);
         checkIfHelperToBeShowed();
         hideKeyboard(this);
-
-        //Log.d("xxqq", "wrociłem do main i control code " + controlCode +
-        //       "a request code " + requestCode + " a result code " + resultCode);
         refreshSorting();
-        ///  gameViewModel.prepareResults();
-//        setSortingByLastUpdate();
+
     }
 
     private void checkIfHelperToBeShowed() {
@@ -281,9 +274,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
     @Override
     public void onGameClick(int position) {
-        Log.d("xxx", "control code = " + controlCode);
-        Log.d("xxx", "sortint = " + currentSorting);
-        Log.d("xxx", "id klieknietej gry to = " + position);
+
 
         Game game = null;
         switch (currentSorting) {
@@ -302,20 +293,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         }
 
-        //        if (controlCode == 0) {
-//           // Log.d("xxx", " wielkość " + Objects.requireNonNull(gameViewModel.getAllGames().getValue().size()));
-//            game = Objects.requireNonNull(gameViewModel.getAllGames().getValue().get(position));
-//        } else if (controlCode == 1) {
-//           // Log.d("xxx", " wielkość " + Objects.requireNonNull(gameViewModel.getFilteredGames().getValue().size()));
-//            game = Objects.requireNonNull(gameViewModel.getFilteredGames().getValue().get(position));
-//        } else if (controlCode == 2) {
-//            //Log.d("xxx", " wielkość " + Objects.requireNonNull(gameViewModel.getAllGamesSortedByAlphabetGames().getValue().size()));
-//            game = Objects.requireNonNull(gameViewModel.getAllGamesSortedByAlphabetGames().getValue().get(position));
-//        } else if (controlCode == 3) {
-//            //Log.d("xxx", " wielkość " + Objects.requireNonNull(gameViewModel.getAllGamesSortedByLastUpdate().getValue().size()));
-//            // game = Objects.requireNonNull(Objects.requireNonNull(gameViewModel.getAllGamesSortedByLastUpdate().getValue()).get(position));
-//            game = Objects.requireNonNull(gameViewModel.getAllGamesSortedByLastUpdate().getValue().get(position));
-//        }
         Intent intent = new Intent(MainActivity.this, AddGame.class);
         intent.putExtra("id", game.getId());
         startActivity(intent);
@@ -339,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     //sorting methods
 
     private void executeSearchByEnteredString() {
-        Log.d("xxx", "ustawiam executeSearchByEnteredString");
+        //Log.d("xxx", "ustawiam executeSearchByEnteredString");
         //Log.d("xxx", "seach condition " + textInputSearchCondition.getText().toString().trim());
         if (!textInputSearchCondition.getText().toString().trim().isEmpty()) {
             //Log.d("xxx", "nie jest puste");
@@ -352,7 +329,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                         MainActivity.this, mainActivity);
                 recyclerView.setAdapter(recyclerViewAdapter);
             });
-            controlCode = 1;
             currentSorting =currentSorting.ENTEREDSTRING;
         } else {
             //Log.d("xxx", "resetuje do domyslneg sortowania czyli 3");
@@ -361,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     }
 
     public void setSortingByLastUpdate() {
-        Log.d("xxx", "wykonujesortingbylastupdate");
+       // Log.d("xxx", "wykonujesortingbylastupdate");
         gameViewModel.getAllGamesSortedByLastUpdate().observe(
                 mainActivity, games -> {
                     recyclerViewAdapter = new RecyclerViewAdapter(games,
@@ -371,12 +347,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
                     //Log.d("xxx", "control code  zaraz po dom srt " + controlCode);
                 });
-        controlCode = 3;
+
         currentSorting = currentSorting.LASTUPDATE;
     }
 
     public void setSortingByAddingDate() {
-        Log.d("xxx", "ustawiam setSortingByAddingDate");
+     //   Log.d("xxx", "ustawiam setSortingByAddingDate");
 
         gameViewModel.getAllGames().observe(
                 mainActivity, games -> {
@@ -386,12 +362,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                     textInputSearchCondition.setText("");
 
                 });
-        controlCode = 0;
+
         currentSorting = currentSorting.ADDINGDATE;
     }
 
     public void setSortingByAlphabet() {
-        Log.d("xxx", "ustawiam setSortingByAlphabet");
+      //  Log.d("xxx", "ustawiam setSortingByAlphabet");
 
         gameViewModel.getAllGamesSortedByAlphabetGames().observe(
                 mainActivity, games -> {
@@ -401,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                     textInputSearchCondition.setText("");
 
                 });
-        controlCode = 2;
+
         currentSorting = currentSorting.ALPHABET;
     }
 
