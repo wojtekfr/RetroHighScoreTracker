@@ -36,6 +36,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -44,13 +45,14 @@ import wojtekfr.highscoretracker.adapter.RecyclerViewAdapter;
 import wojtekfr.highscoretracker.model.Game;
 import wojtekfr.highscoretracker.model.GameViewModel;
 import wojtekfr.highscoretracker.util.CurrentSorting;
+import wojtekfr.highscoretracker.util.EventLogger;
 
 
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnGameClickListener, BottomSheetFragment.ChangeSortingListener {
     private AdView mAdView;
 
     private static final int NEW_GAME_ACTIVITY_REQUEST_CODE = 1;
-    private ArrayList<String> gameArrayList;
+    //  private ArrayList<String> gameArrayList;
     FloatingActionButton addGameFloatingButton;
     Button searchButton;
 
@@ -73,11 +75,16 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
     CurrentSorting currentSorting = CurrentSorting.LASTUPDATE;
 
+    //private FirebaseAnalytics mFirebaseAnalytics;
+    EventLogger eventLogger = new EventLogger(this);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
 
         //ads
@@ -93,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         //showing splash screen only on first run
         SharedPreferences getSharedData = getSharedPreferences("showSplashPref", MODE_PRIVATE);
         boolean showSplashCreen = getSharedData.getBoolean("showSplash", true);
-        //Log.d("xxx", "show splash" + showSplashCreen);
         if (showSplashCreen) {
             Intent intent2 = new Intent(MainActivity.this, SplashShreen.class);
             startActivity(intent2);
@@ -102,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         //setting up UI
 
-       // recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        // recyclerView.setLayoutManager(new LinearLayoutManager(this));
         addGameFloatingButton = findViewById(R.id.floatingButtonAddGame);
         searchButton = findViewById(R.id.buttonSearch);
         textInputSearchCondition = findViewById(R.id.textInputSearchCondition);
@@ -111,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         textInput = findViewById(R.id.textInputSearchCondition);
         textNewGameHelp = findViewById(R.id.textViewAddFirstGameHelper);
         arrowImage = findViewById(R.id.imageViewFirstGameArrowImageView);
-
         recyclerView = findViewById(R.id.recyclerViewGamesList);
 
 
@@ -151,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             public void onClick(View view) {
                 Toast.makeText(MainActivity.this, "ok", Toast.LENGTH_SHORT).show();
                 GameViewModel.deleteAll();
+                eventLogger.logEvent("MainActivity_ClearDatabase");
                 dialog.dismiss();
             }
         });
@@ -163,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         });
 
         addGameFloatingButton.setOnClickListener(view -> {
+            eventLogger.logEvent("MainActivity_AddGameClicked");
 
             Intent intent = new Intent(MainActivity.this, AddGame.class);
             startActivityForResult(intent, NEW_GAME_ACTIVITY_REQUEST_CODE);
@@ -170,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         });
 
         searchButton.setOnClickListener(view -> {
+
             executeSearchByEnteredString();
             hideKeyboard(this);
         });
@@ -181,15 +189,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         sortButton.setOnClickListener(view -> {
             //Log.d("xxx", "control code w bottom listener "+ controlCode);
-
+            eventLogger.logEvent("MainActivity_SortButtonClicked");
             bottomSheetFragment.setCurrentSorting(currentSorting);
             bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
-
-
         });
 
         textInputLayout.setEndIconOnClickListener(view -> {
             //Log.d("qqq","yyy");
+            eventLogger.logEvent("MainActivity_SearchInputEndIconClicked");
             textInputSearchCondition.setText("");
             executeSearchByEnteredString();
         });
@@ -210,22 +217,25 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         gameViewModel.gameCount.observe(mainActivity, count -> {
-
         });
         checkIfHelperToBeShowed();
         hideKeyboard(this);
         refreshSorting();
-
     }
 
     private void checkIfHelperToBeShowed() {
-
         gameViewModel.gameCount.observe(mainActivity, count -> {
-
             if (count != 0) {
                 textNewGameHelp.setVisibility(View.GONE);
+                textNewGameHelp.clearAnimation();
                 arrowImage.clearAnimation();
                 arrowImage.setVisibility(View.GONE);
+                searchButton.setVisibility(View.VISIBLE);
+                textInputSearchCondition.setVisibility(View.VISIBLE);
+                sortButton.setVisibility(View.VISIBLE);
+                textInputLayout.setVisibility(View.VISIBLE);
+                textInput.setVisibility(View.VISIBLE);
+
             } else {
                 textNewGameHelp.setVisibility(View.VISIBLE);
                 arrowImage.setVisibility(View.VISIBLE);
@@ -235,14 +245,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                 animation.setRepeatCount(Animation.INFINITE); //repeating indefinitely
                 animation.setRepeatMode(Animation.REVERSE); //animation will start from end point once ended.
                 arrowImage.startAnimation(animation); //to start animation
+                textNewGameHelp.startAnimation(animation);
+                searchButton.setVisibility(View.INVISIBLE);
+                textInputSearchCondition.setVisibility(View.INVISIBLE);
+                sortButton.setVisibility(View.INVISIBLE);
+                textInputLayout.setVisibility(View.INVISIBLE);
+                textInput.setVisibility(View.INVISIBLE);
             }
-
-
         });
-
-
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -260,6 +271,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.aboutItem) {
+            eventLogger.logEvent("MainActivity_aboutClicked");
+
             Intent intent = new Intent(MainActivity.this, SplashShreen.class);
             startActivity(intent);
             return true;
@@ -275,6 +288,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     @Override
     public void onGameClick(int position) {
 
+        eventLogger.logEvent("MainActivity_GameClicked");
 
         Game game = null;
         switch (currentSorting) {
@@ -289,16 +303,16 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                 break;
             case LASTUPDATE:
                 game = Objects.requireNonNull(gameViewModel.getAllGamesSortedByLastUpdate().getValue().get(position));
-
-
         }
 
         Intent intent = new Intent(MainActivity.this, AddGame.class);
         intent.putExtra("id", game.getId());
+        eventLogger.logEvent("MainActivity_GameClicked");
         startActivity(intent);
     }
 
     public void applySorting(int selectedSortingOption) {
+
         switch (selectedSortingOption) {
             case R.id.radioButtonNoSort:
                 setSortingByAddingDate();
@@ -310,6 +324,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                 setSortingByLastUpdate();
                 break;
         }
+        eventLogger.logEvent("MainActivity_SortingApplied");
     }
 
 
@@ -329,7 +344,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                         MainActivity.this, mainActivity);
                 recyclerView.setAdapter(recyclerViewAdapter);
             });
-            currentSorting =currentSorting.ENTEREDSTRING;
+            currentSorting = currentSorting.ENTEREDSTRING;
+            eventLogger.logEvent("MainActivity_SearchByStringExecuted");
         } else {
             //Log.d("xxx", "resetuje do domyslneg sortowania czyli 3");
             setSortingByLastUpdate();
@@ -337,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     }
 
     public void setSortingByLastUpdate() {
-       // Log.d("xxx", "wykonujesortingbylastupdate");
+        // Log.d("xxx", "wykonujesortingbylastupdate");
         gameViewModel.getAllGamesSortedByLastUpdate().observe(
                 mainActivity, games -> {
                     recyclerViewAdapter = new RecyclerViewAdapter(games,
@@ -352,7 +368,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     }
 
     public void setSortingByAddingDate() {
-     //   Log.d("xxx", "ustawiam setSortingByAddingDate");
+        //   Log.d("xxx", "ustawiam setSortingByAddingDate");
 
         gameViewModel.getAllGames().observe(
                 mainActivity, games -> {
@@ -367,7 +383,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     }
 
     public void setSortingByAlphabet() {
-      //  Log.d("xxx", "ustawiam setSortingByAlphabet");
+        //  Log.d("xxx", "ustawiam setSortingByAlphabet");
 
         gameViewModel.getAllGamesSortedByAlphabetGames().observe(
                 mainActivity, games -> {

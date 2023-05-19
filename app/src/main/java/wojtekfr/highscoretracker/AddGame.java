@@ -23,12 +23,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.Date;
 
 import wojtekfr.highscoretracker.model.Game;
 import wojtekfr.highscoretracker.model.GameViewModel;
 import wojtekfr.highscoretracker.util.Converters;
+import wojtekfr.highscoretracker.util.EventLogger;
 
 public class AddGame extends AppCompatActivity {
 
@@ -48,17 +50,23 @@ public class AddGame extends AppCompatActivity {
     Bitmap bmpImage;
     final int CAMERA_INTENT = 51;
     private static final int MY_CAMERA_REQUEST_CODE = 100;
+    EventLogger eventLogger = new EventLogger(this);
 
-    public void setBottomSheetFragment(BottomSheetFragment bottomSheetFragment) {
-        this.bottomSheetFragment = bottomSheetFragment;
-    }
+//    private FirebaseAnalytics mFirebaseAnalytics;
 
-    BottomSheetFragment bottomSheetFragment;
+//    public void setBottomSheetFragment(BottomSheetFragment bottomSheetFragment) {
+//        this.bottomSheetFragment = bottomSheetFragment;
+//    }
+
+    //BottomSheetFragment bottomSheetFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_game);
+        //mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+
         isEditMode = false;
         gameEditText = findViewById(R.id.editTextGame);
         scoreEditText = findViewById(R.id.editTextHighScore);
@@ -112,14 +120,14 @@ public class AddGame extends AppCompatActivity {
 
             if (areDataCorrect) {
 
-                Intent replyIntent = new Intent();
+                //   Intent replyIntent = new Intent();
                 String gameName = gameEditText.getText().toString().trim();
                 int score = Integer.valueOf(scoreEditText.getText().toString().trim());
                 String note = noteEditText.getText().toString().trim();
 
 
                 Date lastUpdate = new Date(System.currentTimeMillis());
-                Game game = null;
+                Game game;
                 if (bmpImage == null) {
                     game = new Game(gameName,
                             score,
@@ -133,7 +141,14 @@ public class AddGame extends AppCompatActivity {
                             lastUpdate,
                             bmpImage);
                 }
-                GameViewModel.insert(game);
+
+                if (game != null) {
+                    GameViewModel.insert(game);
+                    eventLogger.logEvent("AddGame_GameAdded");
+                } else {
+                    eventLogger.logEvent("AddGame_NullGameDuringAdding");
+                }
+
                 MainActivity.hideKeyboard(this);
                 finish();
             }
@@ -146,7 +161,7 @@ public class AddGame extends AppCompatActivity {
                 Game game = prepareGameObject();
 
                 GameViewModel.update(game);
-            //  Log.d("xxqq", " teraz update finish");
+                eventLogger.logEvent("AddGame_GameUpdated");
                 MainActivity.hideKeyboard(this);
                 finish();
             }
@@ -156,33 +171,31 @@ public class AddGame extends AppCompatActivity {
 
             Game game = prepareGameObject();
             GameViewModel.delete(game);
+            eventLogger.logEvent("AddGame_GameDeleted");
             MainActivity.hideKeyboard(this);
             finish();
         });
+
         takePhotoButton.setOnClickListener(view -> {
             boolean photoActivityAlreadyInitated = false;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_REQUEST_CODE);
-                } else
-                {
-                //   Log.d("xxx", "pierwsze zdjęcie");
-                   photoActivityAlreadyInitated = true;
+                } else {
+                    //   Log.d("xxx", "pierwsze zdjęcie");
+                    photoActivityAlreadyInitated = true;
                     startPhotoActivity();
                 }
             }
 
-            if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0);}
-            else
-            {
-              //  Log.d("xxx", "drugie zdjęcie");
-                if (!photoActivityAlreadyInitated){
-                    startPhotoActivity();}
+            if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0);
+            } else {
+                //  Log.d("xxx", "drugie zdjęcie");
+                if (!photoActivityAlreadyInitated) {
+                    startPhotoActivity();
+                }
             }
-
-
-
         });
     }
 
@@ -192,20 +205,22 @@ public class AddGame extends AppCompatActivity {
         if (requestCode == MY_CAMERA_REQUEST_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startPhotoActivity();
-                }
-            } else {
-                Toast.makeText(this, "camera permission not yet granted", Toast.LENGTH_LONG).show();
             }
+        } else {
+            Toast.makeText(this, "camera permission not yet granted", Toast.LENGTH_LONG).show();
         }
+    }
 
 
     private void startPhotoActivity() {
-       // Log.d("xxx", " robie zdjece");
+        // Log.d("xxx", " robie zdjece");
+        eventLogger.logEvent("AddGame_PhotoStarted");
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(intent, CAMERA_INTENT);
         }
     }
+
     private Game prepareGameObject() {
         Game game = new Game(gameEditText.getText().toString().trim(),
                 Integer.valueOf(scoreEditText.getText().toString().trim()),
@@ -234,6 +249,7 @@ public class AddGame extends AppCompatActivity {
     }
 
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -245,11 +261,10 @@ public class AddGame extends AppCompatActivity {
                 if (bmpImage != null) {
                     imageView.setImageBitmap(bmpImage);
                     imageView.setVisibility(View.VISIBLE);
+                    eventLogger.logEvent("AddGame_PhotoTaken");
                 }
             }
 
         }
     }
-
-
 }
