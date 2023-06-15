@@ -8,8 +8,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -32,13 +34,17 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.android.play.core.review.ReviewException;
+import com.google.android.play.core.review.ReviewInfo;
+import com.google.android.play.core.review.ReviewManager;
+import com.google.android.play.core.review.ReviewManagerFactory;
+import com.google.android.play.core.review.model.ReviewErrorCode;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 import wojtekfr.highscoretracker.adapter.RecyclerViewAdapter;
@@ -46,9 +52,14 @@ import wojtekfr.highscoretracker.model.Game;
 import wojtekfr.highscoretracker.model.GameViewModel;
 import wojtekfr.highscoretracker.util.CurrentSorting;
 import wojtekfr.highscoretracker.util.EventLogger;
+import wojtekfr.highscoretracker.util.RequestReview;
 
 
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnGameClickListener, BottomSheetFragment.ChangeSortingListener {
+
+
+    ReviewInfo reviewInfo;
+    ReviewManager manager;
     private AdView mAdView;
 
     private static final int NEW_GAME_ACTIVITY_REQUEST_CODE = 1;
@@ -83,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         // mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
@@ -119,6 +131,25 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         arrowImage = findViewById(R.id.imageViewFirstGameArrowImageView);
         recyclerView = findViewById(R.id.recyclerViewGamesList);
 
+//
+//        final ViewGroup.MarginLayoutParams lpt =
+//                (ViewGroup.MarginLayoutParams)addGameFloatingButton.getLayoutParams();
+//
+//        lpt.setMargins(lpt.leftMargin,lpt.topMargin,lpt.rightMargin,0);
+//
+//        addGameFloatingButton.setLayoutParams(lpt);
+
+//        ConstraintLayout.LayoutParams rel_btn = new ConstraintLayout.LayoutParams(
+//                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//
+
+        //rel_btn.bottomMargin = 60;
+
+
+//
+
+        // addGameFloatingButton.setLayoutParams(rel_btn);
+
 
         //gameViewModel setup
         //gameArrayList = new ArrayList<>();
@@ -131,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         // necessary to address gameViewModel from other methods
         mainActivity = this;
 
+        prepareReview();
         refreshSorting();
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -149,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         Button cancelButton = dialog.findViewById(R.id.buttonCancelDialog);
 
         checkIfHelperToBeShowed();
+
 
         //onClick listeners
         okButton.setOnClickListener(new View.OnClickListener() {
@@ -188,6 +221,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         });
 
         sortButton.setOnClickListener(view -> {
+
+
             //Log.d("xxx", "control code w bottom listener "+ controlCode);
             eventLogger.logEvent("MainActivity_SortButtonClicked");
             bottomSheetFragment.setCurrentSorting(currentSorting);
@@ -216,11 +251,43 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        gameViewModel.gameCount.observe(mainActivity, count -> {
-        });
         checkIfHelperToBeShowed();
+
+        SharedPreferences sharedPreferences = getSharedPreferences("askReviewPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        gameViewModel.gameCount.observe(mainActivity, count -> {
+            //Log.d("xxx", "licznik " + count);
+            if (!sharedPreferences.getBoolean("reviewAlreadyAsked", false)) {
+                Log.d("xxx", "jeszcze nie było review");
+                if (count == 4) {
+                    editor.putBoolean("askReview", true);
+                    editor.apply();
+                    Log.d("xxx", "oznaczam, że są warunki do review count ==2");
+                } else {
+                    Log.d("xxx", " nie ma warunków do review cont !=2)");
+                }
+            } else {
+                //Log.d("xxx", "już był review");
+
+            }
+        });
+
+        if (sharedPreferences.getBoolean("askReview", false)) {
+            // Log.d("xxx", "teraz proszę o review");
+
+            askForReview();
+            editor.putBoolean("reviewAlreadyAsked", true);
+            editor.putBoolean("askReview", false);
+            editor.apply();
+
+        } else {
+            //Log.d("xxx", "nie ma powodu prosić o review"
+
+        }
+
         hideKeyboard(this);
         refreshSorting();
+
     }
 
     private void checkIfHelperToBeShowed() {
@@ -273,12 +340,23 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         if (id == R.id.aboutItem) {
             eventLogger.logEvent("MainActivity_aboutClicked");
 
-            Intent intent = new Intent(MainActivity.this, SplashShreen.class);
+            Intent intent = new Intent(MainActivity.this, About.class);
             startActivity(intent);
             return true;
         }
         if (id == R.id.clearItem) {
             dialog.show();
+        }
+
+        if (id == R.id.instrutionItem) {
+            Intent intent = new Intent(MainActivity.this, SplashShreen.class);
+            startActivity(intent);
+            return true;
+        }
+        if (id == R.id.reviewItem || id == R.id.rateStar) {
+            ReviewInStore reviewInStore = new ReviewInStore();
+        reviewInStore.reviewInStore(getPackageName(),this);
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -433,7 +511,51 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         //   Log.d("xxxqq", "size " + gameViewModel.gameCount.getValue());
     }
 
+    public void prepareReview() {
 
+        manager = ReviewManagerFactory.create(this);
+
+        Task<ReviewInfo> request = manager.requestReviewFlow();
+        request.addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // We can get the ReviewInfo object
+                reviewInfo = task.getResult();
+                //Toast.makeText(this," review przygotowany", Toast.LENGTH_LONG).show();
+            } else {
+                // There was some problem, log or handle the error code.
+                @ReviewErrorCode int reviewErrorCode = ((ReviewException) task.getException()).getErrorCode();
+                //Toast.makeText(this,"coś nie tak z przygotowaniem review", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    public void askForReview() {
+        if (reviewInfo != null) {
+            Task<Void> flow = manager.launchReviewFlow(this, reviewInfo);
+            flow.addOnCompleteListener(task -> {
+                //Toast.makeText(this," review poszedł", Toast.LENGTH_LONG).show();
+                // The flow has finished. The API does not indicate whether the user
+                // reviewed or not, or even whether the review dialog was shown. Thus, no
+                // matter the result, we continue our app flow.
+                eventLogger.logEvent("MainActivity_AskForReviewDone");
+            });
+        }
+    }
+
+//
+//    public void reviewInStore() {
+//        try {
+//            Intent rateIntent = new Intent(Intent.ACTION_VIEW);
+//            rateIntent.setData(Uri.parse(appURL + getPackageName()));
+//            rateIntent.setPackage("wojtekfr.highscoretracker");
+//            startActivity(rateIntent);
+//        } catch (ActivityNotFoundException e) {
+//            Intent rateIntent = new Intent(Intent.ACTION_VIEW);
+//            rateIntent.setData(Uri.parse(appURL + getPackageName()));
+//            startActivity(rateIntent);
+//        }
+
+//    }
     public static void hideKeyboard(Activity activity) {
         InputMethodManager inputMethodManager = (InputMethodManager) activity
                 .getSystemService(Activity.INPUT_METHOD_SERVICE);

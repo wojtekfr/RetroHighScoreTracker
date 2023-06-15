@@ -1,4 +1,5 @@
 <resources>
+
     <string name="app_name">Retro High Score</string>
     <string name="addButtonText">Add game</string>
     <string name="saveGameButton"><![CDATA[Save Game & Score]]></string>
@@ -11,7 +12,7 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-    <string name="aboutText">
+    <string name="splashText">
         0 REM This app is designed to track your high scores from retro games
         \n\n1 REM It is useful especially for playing on real old computers and consoles,
         \n\n2 REM as often such software does not allow any other way to save your high score
@@ -24,5 +25,22 @@
         \n\n70 GOTO 50
 
     </string>
+
+    <string name="aboutText">
+        Thank you for using this app
+        \n\nIt is made by retro games enthusiast for enthusiasts
+        \n\nHope you liked it
+        \n\nFrabi
+    </string>
+
+    <string name="aboutEmail">
+        If you have any suggestions how to make it better please send them to
+        \n\nfrabidev@gmail.com
+</string>
+
+
+
+    <string name="aboutReview"><![CDATA[If you like this app please review it in <br><br><b><u>PLAY STORE</u></b><br>]]></string>
+
     <string name="firstTimeAddingText">Add first game</string>
 </resources>

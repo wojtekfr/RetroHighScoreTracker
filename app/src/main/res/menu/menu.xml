@@ -7,7 +7,22 @@
         android:orderInCategory="100"
         android:title="About app"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/instrutionItem"
+        android:title="Instructions" />
+    <item
+        android:id="@+id/reviewItem"
+        android:title="Review App" />
+
     <item
         android:id="@+id/clearItem"
         android:title="Clear database" />
+
+    <item
+        android:id="@+id/rateStar"
+        android:icon="@drawable/baseline_star_rate_24"
+        app:showAsAction="always"
+        android:title = "Rate"
+    />
 </menu>
