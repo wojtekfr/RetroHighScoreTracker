@@ -6,11 +6,10 @@ import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class SplashShreen extends AppCompatActivity {
+public class StartScreen extends AppCompatActivity {
 Button okButton;
         TextView textView;
 
@@ -23,15 +22,12 @@ Button okButton;
         okButton = findViewById(R.id.buttonSplashOk);
 
         textView.setMovementMethod(new ScrollingMovementMethod());
-    okButton.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            SharedPreferences sharedPreferences = getSharedPreferences("showSplashPref", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("showSplash", false);
-            editor.apply();
-            finish();
-        }
+    okButton.setOnClickListener(view -> {
+        SharedPreferences sharedPreferences = getSharedPreferences("showSplashPref", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("showSplash", false);
+        editor.apply();
+        finish();
     });
     }
 

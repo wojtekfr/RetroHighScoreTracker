@@ -43,4 +43,35 @@
     <string name="aboutReview"><![CDATA[If you like this app please review it in <br><br><b><u>PLAY STORE</u></b><br>]]></string>
 
     <string name="firstTimeAddingText">Add first game</string>
+    <string name="aboutOKButtonText">OK</string>
+    <string name="addGameHint">game name</string>
+    <string name="addScoreHint">high score</string>
+    <string name="AddNoteHint">optional note</string>
+    <string name="addLastUpdateText">last update</string>
+    <string name="addUpdateButtonText">Update</string>
+    <string name="addDeleteButtonText">Delete</string>
+    <string name="addPhotoDescription">photo of selected game</string>
+    <string name="addTakePhotoButtonText">Take a photo</string>
+    <string name="searchTextHint">name of game</string>
+    <string name="buttonSearchText">SEARCH</string>
+    <string name="sortButtonText">SORT</string>
+    <string name="addGameButtonText">Add new game</string>
+    <string name="rightArrowDescription">Right arrow</string>
+    <string name="sortingMethodText">Selected sorting method</string>
+    <string name="noSortingText">No sorting</string>
+    <string name="sortByNameText">Sort by name</string>
+    <string name="sortByLastUpdateText">Sort By Last Update</string>
+    <string name="sortingOKButtonText">OK</string>
+    <string name="photoOfGameDescription">photo of given game</string>
+    <string name="deleteWarningText">"Whole database will be permanently deleted. "</string>
+    <string name="deleteAysText">Are you sure ?</string>
+    <string name="deleteAllButtonText">DELETE ALL</string>
+    <string name="CancelDeleteAllButton">Cancel</string>
+    <string name="about_app">About app</string>
+    <string name="instructions">Instructions</string>
+    <string name="review_app">Review App</string>
+    <string name="clear_database">Clear database</string>
+    <string name="rate">Rate</string>
+    <string name="commodore_64_computer">Commodore 64 computer</string>
+    <string name="ok">OK</string>
 </resources>

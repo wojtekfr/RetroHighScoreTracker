@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:overScrollMode="always"
-    tools:context=".SplashShreen">
+    tools:context=".StartScreen">
 
     <TextView
         android:id="@+id/textViewSplash"
@@ -30,14 +30,17 @@
         android:layout_height="200dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/buttonSplashOk"
-        app:srcCompat="@drawable/c64crop20230503_121514" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/c64crop20230503_121514"
+        android:contentDescription="@string/commodore_64_computer" />
 
     <Button
         android:id="@+id/buttonSplashOk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="OK"
+        android:text="@string/ok"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

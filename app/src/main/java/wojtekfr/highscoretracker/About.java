@@ -7,9 +7,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import wojtekfr.highscoretracker.util.ReviewInStore;
 
 public class About extends AppCompatActivity {
 
@@ -36,24 +37,7 @@ public class About extends AppCompatActivity {
             reviewInStore.reviewInStore(getPackageName(), context );
         });
 
-
-//        textView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-//                emailIntent.setType("plain/text");
-//                emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,new String[] {"frabidev@gmail.com" });
-//                emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "feedback for High Score Tracker");
-//                emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,"");
-//                startActivity(Intent.createChooser(emailIntent, "Send mail..."));
-//            }
-//        });
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        okButton.setOnClickListener(view -> finish());
     }
 }
 

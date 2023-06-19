@@ -6,10 +6,9 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class EventLogger {
 
-    private FirebaseAnalytics mFirebaseAnalytics;
+    private final FirebaseAnalytics mFirebaseAnalytics;
 
     public EventLogger(Context context){
-
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
     }
 

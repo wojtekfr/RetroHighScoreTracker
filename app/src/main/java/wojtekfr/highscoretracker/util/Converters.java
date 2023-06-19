@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import androidx.room.TypeConverter;
 
 import java.io.ByteArrayOutputStream;
-import java.sql.Timestamp;
 import java.util.Date;
 
 public class Converters {

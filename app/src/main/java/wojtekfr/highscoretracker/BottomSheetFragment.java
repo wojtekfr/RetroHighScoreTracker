@@ -3,7 +3,6 @@ package wojtekfr.highscoretracker;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,19 +62,18 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        Log.d("xxx","tworzę bottom");
         super.onViewCreated(view, savedInstanceState);
 
 
 
         switch (currentSorting){
-            case ADDINGDATE:
+            case ADDING_DATE:
                 ((RadioButton) radioGroup.getChildAt(0)).setChecked(true);
                 break;
             case ALPHABET:
                 ((RadioButton) radioGroup.getChildAt(1)).setChecked(true);
                 break;
-            case LASTUPDATE:
+            case LAST_UPDATE:
                 ((RadioButton) radioGroup.getChildAt(2)).setChecked(true);
                 break;
         }

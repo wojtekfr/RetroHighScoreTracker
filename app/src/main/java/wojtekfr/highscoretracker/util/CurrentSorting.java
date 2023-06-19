@@ -1,7 +1,7 @@
 package wojtekfr.highscoretracker.util;
 
 public enum CurrentSorting {
-    ADDINGDATE, ALPHABET, LASTUPDATE, ENTEREDSTRING
+    ADDING_DATE, ALPHABET, LAST_UPDATE, ENTERED_STRING
 }
 
 

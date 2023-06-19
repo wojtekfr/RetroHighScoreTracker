@@ -1,25 +1,23 @@
 package wojtekfr.highscoretracker.data;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
 import java.util.List;
-import java.util.Objects;
 
 import wojtekfr.highscoretracker.model.Game;
 import wojtekfr.highscoretracker.util.GameRoomDatabase;
 
 public class GameRepository {
 
-    private GameDao gameDao;
-    private LiveData<List<Game>> allGames;
-    private LiveData<List<Game>> filteredGames;
-    private LiveData<List<Game>> allGamesSortedByAlphabet;
-    private LiveData<List<Game>> allGamesSortedByLastUpdate;
+    private final GameDao gameDao;
+    private final LiveData<List<Game>> allGames;
+    private final LiveData<List<Game>> filteredGames;
+    private final LiveData<List<Game>> allGamesSortedByAlphabet;
+    private final LiveData<List<Game>> allGamesSortedByLastUpdate;
 
-    private LiveData<Integer> gameCountLive;
+    private final LiveData<Integer> gameCountLive;
 
     public GameRepository(Application application, String searchCondition) {
         GameRoomDatabase db = GameRoomDatabase.getDatabase(application);
@@ -40,9 +38,7 @@ public class GameRepository {
     public LiveData<List<Game>> getAllGamesSortedByLastUpdate(){return allGamesSortedByLastUpdate;}
 
     public void insert(Game game) {
-        GameRoomDatabase.databaseWriterExecutor.execute(() -> {
-            gameDao.insert(game);
-        });
+        GameRoomDatabase.databaseWriterExecutor.execute(() -> gameDao.insert(game));
     }
 
     public LiveData<Game> get(int id) {
@@ -58,7 +54,7 @@ public class GameRepository {
     }
 
     public void deleteAll(){
-        GameRoomDatabase.databaseWriterExecutor.execute(() -> gameDao.deleteAll());
+        GameRoomDatabase.databaseWriterExecutor.execute(gameDao::deleteAll);
     }
     public LiveData<Integer> getCountGames(){
         return gameCountLive;

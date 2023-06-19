@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:backgroundTint="#F44336">
@@ -14,7 +13,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="24dp"
         android:singleLine="false"
-        android:text="Whole database will be permanently deleted. "
+        android:text="@string/deleteWarningText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -27,7 +26,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="24dp"
         android:singleLine="false"
-        android:text="\Are you sure ?"
+        android:text="@string/deleteAysText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewDialog" />
@@ -39,7 +38,8 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
         android:backgroundTint="#F44336"
-        android:text="DELETE ALL"
+        android:text="@string/deleteAllButtonText"
+        android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.727"
@@ -53,7 +53,7 @@
         android:layout_marginStart="48dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
-        android:text="Cancel"
+        android:text="@string/CancelDeleteAllButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewDialog2" />

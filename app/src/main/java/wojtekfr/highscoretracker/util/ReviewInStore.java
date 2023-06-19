@@ -1,4 +1,4 @@
-package wojtekfr.highscoretracker;
+package wojtekfr.highscoretracker.util;
 
 
 import android.content.ActivityNotFoundException;
@@ -9,7 +9,7 @@ import android.net.Uri;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class ReviewInStore extends AppCompatActivity {
-    private static String appURL = "https://play.google.com/store/apps/details?id=";
+    private static final String appURL = "https://play.google.com/store/apps/details?id=";
 
 
     public void reviewInStore(String packageName, Context context) {

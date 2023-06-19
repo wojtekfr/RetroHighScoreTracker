@@ -1,8 +1,5 @@
 package wojtekfr.highscoretracker.adapter;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,18 +14,16 @@ import java.util.Objects;
 
 import wojtekfr.highscoretracker.R;
 import wojtekfr.highscoretracker.model.Game;
-import wojtekfr.highscoretracker.util.Converters;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
-    private List<Game> gameList;
-    private Context context;
-    private OnGameClickListener GameClickListener;
+    private final List<Game> gameList;
+
+    private final OnGameClickListener GameClickListener;
 
 
-    public RecyclerViewAdapter(List<Game> gameList, Context context, OnGameClickListener onGameClickListener) {
+    public RecyclerViewAdapter(List<Game> gameList, OnGameClickListener onGameClickListener) {
         this.gameList = gameList;
-        this.context = context;
         this.GameClickListener = onGameClickListener;
     }
 
@@ -51,7 +46,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public int getItemCount() {
-        return Objects.requireNonNull(gameList.size());
+        return gameList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

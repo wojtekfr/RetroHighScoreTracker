@@ -1,7 +1,6 @@
 package wojtekfr.highscoretracker.model;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -10,7 +9,6 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 
 import wojtekfr.highscoretracker.data.GameRepository;
-import wojtekfr.highscoretracker.util.GameRoomDatabase;
 
 public class GameViewModel extends AndroidViewModel {
     public static GameRepository repository;

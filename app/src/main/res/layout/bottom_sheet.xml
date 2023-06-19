@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottomSheet"
 
     android:layout_width="match_parent"
@@ -16,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Selected sorting method"
+        android:text="@string/sortingMethodText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -36,19 +35,19 @@
             android:id="@+id/radioButtonNoSort"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="No sorting" />
+            android:text="@string/noSortingText" />
 
         <RadioButton
             android:id="@+id/radioButtonSortByName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sort by name" />
+            android:text="@string/sortByNameText" />
 
         <RadioButton
             android:id="@+id/radioButtonSortByLastUpdate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sort By Last Update" />
+            android:text="@string/sortByLastUpdateText" />
     </RadioGroup>
 
     <Button
@@ -56,7 +55,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="OK"
+        android:text="@string/sortingOKButtonText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioGroup" />

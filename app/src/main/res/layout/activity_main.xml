@@ -33,9 +33,10 @@
                 android:id="@+id/textInputSearchCondition"
                 android:layout_width="150dp"
                 android:layout_height="match_parent"
-                android:hint="name of game"
+                android:hint="@string/searchTextHint"
                 android:imeOptions="actionDone"
                 android:singleLine="true"
+                android:textColorHint="#757575"
                 android:textSize="11sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -45,7 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginStart="2dp"
-            android:text="SEARCH"
+            android:text="@string/buttonSearchText"
             android:textSize="11sp" />
 
     </LinearLayout>
@@ -56,7 +57,7 @@
         android:layout_height="64dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:text="SORT"
+        android:text="@string/sortButtonText"
         android:textSize="11sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -81,10 +82,12 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="60dp"
         android:clickable="true"
-        android:contentDescription="Add new game"
+        android:contentDescription="@string/addGameButtonText"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        app:srcCompat="@android:drawable/ic_input_add"
+        tools:ignore="ImageContrastCheck"
+        android:focusable="true" />
 
 
     <TextView
@@ -103,6 +106,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginBottom="75dp"
+        android:contentDescription="@string/rightArrowDescription"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/floatingButtonAddGame"
@@ -119,6 +123,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerViewGamesList"></com.google.android.gms.ads.AdView>
-
+        app:layout_constraintTop_toBottomOf="@+id/recyclerViewGamesList" />
 </androidx.constraintlayout.widget.ConstraintLayout>
