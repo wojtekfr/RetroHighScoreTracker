@@ -74,4 +74,5 @@
     <string name="rate">Rate</string>
     <string name="commodore_64_computer">Commodore 64 computer</string>
     <string name="ok">OK</string>
+    <string name="camera_access">Please allow camera access</string>
 </resources>

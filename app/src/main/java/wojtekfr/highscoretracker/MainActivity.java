@@ -1,6 +1,7 @@
 package wojtekfr.highscoretracker;
 
-import androidx.annotation.Nullable;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -49,7 +50,7 @@ import wojtekfr.highscoretracker.util.ReviewInStore;
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnGameClickListener, BottomSheetFragment.ChangeSortingListener {
     ReviewInfo reviewInfo;
     ReviewManager manager;
-    private static final int NEW_GAME_ACTIVITY_REQUEST_CODE = 1;
+    // private static final int NEW_GAME_ACTIVITY_REQUEST_CODE = 1;
     FloatingActionButton addGameFloatingButton;
     Button searchButton;
     TextInputEditText textInputSearchCondition;
@@ -103,6 +104,37 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         refreshSorting();
         checkIfHelperToBeShowed();
 
+        //what happen after each return from addGame
+        ActivityResultLauncher<Intent> addGameResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    checkIfHelperToBeShowed();
+
+                    //asking for review
+                    // first check if number of games added exceeded and register it in shared preferences
+                    SharedPreferences sharedPreferences = getSharedPreferences("askReviewPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    gameViewModel.gameCount.observe(mainActivity, count -> {
+                        if (!sharedPreferences.getBoolean("reviewAlreadyAsked", false)) {
+                            if (count == 4) {
+                                editor.putBoolean("askReview", true);
+                                editor.apply();
+                            }
+                        }
+                    });
+                    // second check shared preferences and launch ask for review if condition met
+                    if (sharedPreferences.getBoolean("askReview", false)) {
+                        askForReview();
+                        editor.putBoolean("reviewAlreadyAsked", true);
+                        editor.putBoolean("askReview", false);
+                        editor.apply();
+                    }
+
+                    hideKeyboard(mainActivity);
+                    refreshSorting();
+                });
+
+
         //onClick listeners
         okButton.setOnClickListener(view -> {
             Toast.makeText(MainActivity.this, "ok", Toast.LENGTH_SHORT).show();
@@ -116,8 +148,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         addGameFloatingButton.setOnClickListener(view -> {
             eventLogger.logEvent("MainActivity_AddGameClicked");
 
-            Intent intent = new Intent(MainActivity.this, AddGame.class);
-            startActivityForResult(intent, NEW_GAME_ACTIVITY_REQUEST_CODE);
+            Intent intent = new Intent(this, AddGame.class);
+            //startActivityForResult(intent, NEW_GAME_ACTIVITY_REQUEST_CODE);
+            addGameResultLauncher.launch(intent);
+
 
         });
 
@@ -151,30 +185,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     }
 
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        checkIfHelperToBeShowed();
-        SharedPreferences sharedPreferences = getSharedPreferences("askReviewPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        gameViewModel.gameCount.observe(mainActivity, count -> {
-            if (!sharedPreferences.getBoolean("reviewAlreadyAsked", false)) {
-                if (count == 4) {
-                    editor.putBoolean("askReview", true);
-                    editor.apply();
-                }
-            }
-        });
-
-        if (sharedPreferences.getBoolean("askReview", false)) {
-            askForReview();
-            editor.putBoolean("reviewAlreadyAsked", true);
-            editor.putBoolean("askReview", false);
-            editor.apply();
-        }
-        hideKeyboard(this);
-        refreshSorting();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -196,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             dialog.show();
         }
 
-        if (id == R.id.instrutionItem) {
+        if (id == R.id.instructionItem) {
             eventLogger.logEvent("MainActivity_instructionClicked");
             Intent intent = new Intent(MainActivity.this, StartScreen.class);
             startActivity(intent);
@@ -274,23 +284,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         }
         eventLogger.logEvent("MainActivity_SortingApplied");
     }
-
-
-//    public void applySorting(int selectedSortingOption) {
-//        switch (selectedSortingOption) {
-//            case R.id.radioButtonNoSort:
-//                setSortingByAddingDate();
-//                break;
-//            case R.id.radioButtonSortByName:
-//                setSortingByAlphabet();
-//                break;
-//            case R.id.radioButtonSortByLastUpdate:
-//                setSortingByLastUpdate();
-//                break;
-//        }
-//        eventLogger.logEvent("MainActivity_SortingApplied");
-//    }
-
 
     //sorting methods
     private void executeSearchByEnteredString() {
