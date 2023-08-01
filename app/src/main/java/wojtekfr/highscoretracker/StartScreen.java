@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.widget.Button;
 import android.widget.TextView;
-
+//
 public class StartScreen extends AppCompatActivity {
 Button okButton;
         TextView textView;
