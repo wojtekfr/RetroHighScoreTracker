@@ -50,7 +50,6 @@ import wojtekfr.highscoretracker.util.ReviewInStore;
 public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnGameClickListener, BottomSheetFragment.ChangeSortingListener {
     ReviewInfo reviewInfo;
     ReviewManager manager;
-    // private static final int NEW_GAME_ACTIVITY_REQUEST_CODE = 1;
     FloatingActionButton addGameFloatingButton;
     Button searchButton;
     TextInputEditText textInputSearchCondition;
@@ -131,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                     }
 
                     hideKeyboard(mainActivity);
+                    textInputSearchCondition.clearFocus();
                     refreshSorting();
                 });
 
@@ -151,18 +151,22 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             Intent intent = new Intent(this, AddGame.class);
             //startActivityForResult(intent, NEW_GAME_ACTIVITY_REQUEST_CODE);
             addGameResultLauncher.launch(intent);
-
-
         });
 
         searchButton.setOnClickListener(view -> {
             executeSearchByEnteredString();
             hideKeyboard(this);
+            textInputSearchCondition.clearFocus();
+            textInputSearchCondition.setCursorVisible(false);
         });
+
+        textInputSearchCondition.setOnClickListener(view ->
+                textInputSearchCondition.setCursorVisible(true));
 
         textInputSearchCondition.setOnFocusChangeListener((view, b) -> {
             executeSearchByEnteredString();
             hideKeyboard(this);
+            textInputSearchCondition.setCursorVisible(true);
         });
 
         sortButton.setOnClickListener(view -> {
@@ -177,13 +181,16 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             executeSearchByEnteredString();
         });
 
+        textInputLayout.setOnClickListener(view -> textInputSearchCondition.setCursorVisible(true));
+
         textInputSearchCondition.setOnEditorActionListener((textView, i, keyEvent) -> {
             executeSearchByEnteredString();
             hideKeyboard(mainActivity);
+            textInputSearchCondition.setCursorVisible(false);
+            textInputSearchCondition.clearFocus();
             return false;
         });
     }
-
 
 
     @Override
@@ -343,6 +350,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         refreshSorting();
         checkIfHelperToBeShowed();
         hideKeyboard(this);
+        textInputSearchCondition.clearFocus();
     }
 
     private void refreshSorting() {
@@ -412,5 +420,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             view = new View(activity);
         }
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
+
     }
+
 }
